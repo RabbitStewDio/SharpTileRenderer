@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-
-namespace SharpTileRenderer.TexturePack.Grids
+﻿namespace SharpTileRenderer.TexturePack.Grids
 {
-    public class GridTileDefinition
+    public readonly struct GridTileDefinition
     {
         public GridTileDefinition(int gridX,
                                   int gridY,
@@ -22,13 +20,13 @@ namespace SharpTileRenderer.TexturePack.Grids
             GridY = gridY;
             AnchorX = anchorX;
             AnchorY = anchorY;
-            Tags = new HashSet<string>(tags);
+            Tags = new ReadOnlyListWrapper<string>(tags);
         }
 
         public GridTileDefinition(string tag) : this(tag, 0, 0, null, null, tag)
         { }
 
-        public ISet<string> Tags { get; }
+        public ReadOnlyListWrapper<string> Tags { get; }
         public string Name { get; }
         public int GridX { get; }
         public int GridY { get; }

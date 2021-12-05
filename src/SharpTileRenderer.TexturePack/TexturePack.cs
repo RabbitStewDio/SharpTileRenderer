@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace SharpTileRenderer.TexturePack.Grids
+namespace SharpTileRenderer.TexturePack
 {
-    public class TexturePack<TTile> : ITexturePack<TTile>
+    public class TexturePack : ITileCollection
     {
         public string Name { get; }
-        public List<ITextureFile<TTile>> TextureFiles { get; }
+        public List<ITileCollection> TileCollections { get; }
         public IntDimension TileSize { get; }
         public TextureType TextureType { get; }
+        readonly Lazy<List<TexturedTileSpec>> tiles;
 
         public TexturePack(string name,
                            IntDimension tileSize,
                            TextureType textureType,
-                           params ITextureFile<TTile>[] textureFiles)
+                           params ITileCollection[] textureFiles)
         {
             TileSize = tileSize;
             TextureType = textureType;
@@ -23,20 +25,13 @@ namespace SharpTileRenderer.TexturePack.Grids
             }
 
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            TextureFiles = new List<ITextureFile<TTile>>(textureFiles);
+            TileCollections = new List<ITileCollection>(textureFiles);
+            tiles = new Lazy<List<TexturedTileSpec>>(() => TileCollections.SelectMany(f => f.ProduceTiles()).ToList());
         }
-
-        public IEnumerable<TTile> Tiles => ProduceTiles();
-
-        IEnumerable<TTile> ProduceTiles()
+        
+        public IEnumerable<TexturedTileSpec> ProduceTiles()
         {
-            foreach (var f in TextureFiles)
-            {
-                foreach (var x in f.ProduceTiles())
-                {
-                    yield return x;
-                }
-            }
+            return tiles.Value;
         }
     }
 }

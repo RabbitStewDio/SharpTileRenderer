@@ -11,7 +11,7 @@ namespace SharpTileRenderer.TexturePack.Atlas
         readonly ITextureOperations<TTexture, TColor> textureOperations;
 
         public MultiTextureAtlasBuilder(ITextureOperations<TTexture, TColor> textureOperations,
-                                        int size = TextureAtlasBuilder<TTexture, TColor>.MaxTextureSize)
+                                        int size = TextureAtlasBuilder.DefaultMaxTextureSize)
         {
             this.textureOperations = textureOperations;
             this.size = size;

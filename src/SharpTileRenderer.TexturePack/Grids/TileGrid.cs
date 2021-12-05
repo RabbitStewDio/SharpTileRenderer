@@ -1,70 +1,52 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace SharpTileRenderer.TexturePack.Grids
 {
     /// <summary>
-    ///   Related to GridTextureFile
+    ///   A grid of tiles defined for a given texture.
     /// </summary>
-    public class TileGrid : IEnumerable<GridTileDefinition>
+    public readonly struct TileGrid
     {
-        public TileGrid(int tileWidth,
-                        int tileHeight,
+        public TileGrid(int cellWidth,
+                        int cellHeight,
                         int offsetX,
                         int offsetY,
                         int anchorX,
                         int anchorY,
                         params GridTileDefinition[] tiles) :
-            this(tileWidth, tileHeight, offsetX, offsetY, anchorX, anchorY, 0, 0, tiles)
+            this(cellWidth, cellHeight, offsetX, offsetY, anchorX, anchorY, 0, 0, tiles)
         { }
 
-        public TileGrid(int tileWidth,
-                        int tileHeight,
+        public TileGrid(int cellWidth,
+                        int cellHeight,
                         int offsetX,
                         int offsetY,
                         int anchorX,
                         int anchorY,
-                        int borderX,
-                        int borderY,
+                        int cellPaddingX,
+                        int cellPaddingY,
                         params GridTileDefinition[] tiles)
         {
             Tiles = new List<GridTileDefinition>(tiles);
-            TilesGroups = new List<GridTileDefinition>();
-            TileWidth = tileWidth;
-            TileHeight = tileHeight;
+            CellWidth = cellWidth;
+            CellHeight = cellHeight;
             OffsetX = offsetX;
             OffsetY = offsetY;
             AnchorX = anchorX;
             AnchorY = anchorY;
-            BorderX = borderX;
-            BorderY = borderY;
+            CellPaddingX = cellPaddingX;
+            CellPaddingY = cellPaddingY;
         }
 
-        public List<GridTileDefinition> Tiles { get; }
-        public List<GridTileDefinition> TilesGroups { get; }
-        public int TileWidth { get; }
-        public int TileHeight { get; }
+        public ReadOnlyListWrapper<GridTileDefinition> Tiles { get; }
+        public int CellWidth { get; }
+        public int CellHeight { get; }
         public int OffsetX { get; }
         public int OffsetY { get; }
         public int AnchorX { get; }
         public int AnchorY { get; }
-        public int BorderX { get; }
-        public int BorderY { get; }
-
-        public void Add(GridTileDefinition tile)
-        {
-            Tiles.Add(tile ?? throw new ArgumentNullException(nameof(tile)));
-        }
-
-        public IEnumerator<GridTileDefinition> GetEnumerator()
-        {
-            return Tiles.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        public int CellPaddingX { get; }
+        public int CellPaddingY { get; }
     }
 }

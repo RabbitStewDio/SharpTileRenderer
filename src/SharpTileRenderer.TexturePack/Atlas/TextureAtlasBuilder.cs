@@ -2,6 +2,13 @@
 
 namespace SharpTileRenderer.TexturePack.Atlas
 {
+    public static class TextureAtlasBuilder
+    {
+        public const int DefaultMaxTextureSize = 4096;
+        public const int DefaultPadding = 2;
+        
+    }
+    
     /// <summary>
     ///   Merges textures into one or more texture atlases. This class arranges
     ///   textures into bands and splits those bands into lines. It works best
@@ -108,20 +115,20 @@ namespace SharpTileRenderer.TexturePack.Atlas
             }
         }
 
-        public const int MaxTextureSize = 4096;
-
         readonly TreeNode root;
         readonly ITextureOperations<TTexture, TColor> textureOperations;
+        readonly int padding;
 
         public TTexture Texture { get; }
-        public const int Padding = 2;
 
         public TextureAtlasBuilder(ITextureOperations<TTexture, TColor> textureOperations,
-                                   TTexture texture)
+                                   TTexture texture,
+                                   int padding = TextureAtlasBuilder.DefaultPadding)
         {
             root = new TreeNode(texture.Bounds);
             this.Texture = texture;
             this.textureOperations = textureOperations;
+            this.padding = padding;
         }
 
         public bool Insert(TTexture tile, out TTexture result)
@@ -132,7 +139,7 @@ namespace SharpTileRenderer.TexturePack.Atlas
                 return true;
             }
 
-            var res = root.Insert(tile, Padding);
+            var res = root.Insert(tile, padding);
             if (res != null)
             {
                 return res.Harvest(textureOperations, Texture, out result);

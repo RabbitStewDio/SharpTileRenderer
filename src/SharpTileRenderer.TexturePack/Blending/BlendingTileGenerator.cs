@@ -1,5 +1,4 @@
 ﻿using SharpTileRenderer.Navigation;
-using SharpTileRenderer.TexturePack.Grids;
 using SharpTileRenderer.TexturePack.Operations;
 using SharpTileRenderer.TileMatching.Registry;
 using System;
@@ -82,7 +81,7 @@ namespace SharpTileRenderer.TexturePack.Blending
             var wrappedTexture = textureOperations.CreateTexture(etag, wrappedTextureSize);
             textureOperations.ApplyTextureData(wrappedTexture, result, sourceArea.Origin);
 
-            tile = tileProducer.Produce(tileSize, anchor, etag, wrappedTexture);
+            tile = tileProducer.Produce(wrappedTexture, tileSize, anchor, etag);
             return true;
         }
 

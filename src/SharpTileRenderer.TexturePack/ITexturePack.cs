@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SharpTileRenderer.TexturePack
 {
@@ -6,6 +7,7 @@ namespace SharpTileRenderer.TexturePack
     ///  A texture pack contains the sum of all textures for a given game. The
     ///  textures are provided as one or more texture files.
     /// </summary>
+    [Obsolete]
     public interface ITexturePack<TTile>
     {
         IEnumerable<TTile> Tiles { get; }

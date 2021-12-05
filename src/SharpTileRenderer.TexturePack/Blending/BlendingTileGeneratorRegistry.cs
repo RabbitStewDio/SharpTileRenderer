@@ -1,5 +1,4 @@
 ﻿using SharpTileRenderer.Navigation;
-using SharpTileRenderer.TexturePack.Grids;
 using SharpTileRenderer.TexturePack.Operations;
 using SharpTileRenderer.TileMatching.Registry;
 using System;
