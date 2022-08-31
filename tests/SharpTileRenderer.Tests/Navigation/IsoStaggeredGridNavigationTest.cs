@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SharpTileRenderer.Navigation;
+using SharpTileRenderer.Navigation.Navigators;
 using System.Collections.Generic;
 
 namespace SharpTileRenderer.Tests.Navigation

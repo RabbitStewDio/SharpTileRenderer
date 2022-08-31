@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema version="4.0" vc:minVersion="1.1"
+            elementFormDefault="qualified"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+            xmlns="https://docs.rabbit-stew-dio.com/xml-schema/tilematcher/v1/"
+            targetNamespace="https://docs.rabbit-stew-dio.com/xml-schema/tilematcher/v1/">
+
+    <xsd:complexType name="propertyElement">
+        <xsd:all>
+            <xsd:element name="name" type="xsd:string"/>
+            <xsd:element name="value" type="xsd:string"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="propertiesElement">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="property" type="propertyElement"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="classesElement">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="class" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="flagsElement">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="flag" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="classSetElement">
+        <xsd:all>
+            <xsd:element name="id" type="xsd:string"/>
+            <xsd:element name="properties" type="propertiesElement" minOccurs="0"/>
+            <xsd:element name="default-class" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="classes" type="classesElement"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="quantifiedClassSetElement">
+        <xsd:all>
+            <xsd:element name="id" type="xsd:string"/>
+            <xsd:element name="properties" type="propertiesElement" minOccurs="0"/>
+            <xsd:element name="default-class" type="xsd:string"/>
+            <xsd:element name="default-quantity" type="xsd:int" default="0"/>
+            <xsd:element name="classes" type="classesElement"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="tagDataElement">
+        <xsd:all>
+            <xsd:element name="id" type="xsd:string"/>
+            <xsd:element name="properties" type="propertiesElement" minOccurs="0"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="quantifiedTagDataElement">
+        <xsd:all>
+            <xsd:element name="id" type="xsd:string"/>
+            <xsd:element name="properties" type="propertiesElement" minOccurs="0"/>
+            <xsd:element name="default-quantity" type="xsd:int" default="0"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="dataSetsElement">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:choice>
+                <!--
+                <xsd:element name="class-set" type="classSetElement"/>
+                <xsd:element name="quantified-class-set" type="quantifiedClassSetElement"/>
+                -->
+                <xsd:element name="tag-data" type="tagDataElement"/>
+                <xsd:element name="quantified-tag-data" type="quantifiedTagDataElement"/>
+            </xsd:choice>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="matcherElement" abstract="true"/>
+
+    <xsd:element name="matcherAbstract" abstract="true" type="matcherElement"/>
+
+    <xsd:complexType name="entitySourceElement">
+        <xsd:all>
+            <xsd:element name="entity-query-id" type="xsd:string"/>
+            <xsd:element name="query-type" type="layerQueryTypeEnum" minOccurs="0"/>
+            <xsd:element name="sort-order" type="renderingSortOrderEnum" minOccurs="0"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="layerElement">
+        <xsd:sequence>
+            <xsd:element name="layer-id" type="xsd:string"/>
+            <xsd:element name="enabled" type="xsd:boolean" minOccurs="0"/>
+            <xsd:element name="render-order" type="xsd:int" minOccurs="0"/>
+            <xsd:element name="entity-source" type="entitySourceElement"/>
+            <xsd:element name="feature-flags" type="featureFlagsElement" minOccurs="0"/>
+            <xsd:element name="properties" type="propertiesElement" minOccurs="0"/>
+            <xsd:choice maxOccurs="unbounded">
+                <xsd:element ref="matcherAbstract"/>
+            </xsd:choice>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="layersElement">
+        <xsd:sequence>
+            <xsd:element name="layer" type="layerElement" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:simpleType name="layerQueryTypeEnum">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="grid"/>
+            <xsd:enumeration value="sparse"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="renderingSortOrderEnum">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="top-down-left-right"/>
+            <xsd:enumeration value="top-down-right-left"/>
+            <xsd:enumeration value="bottom-up-left-right"/>
+            <xsd:enumeration value="bottom-up-right-left"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="graphicTagElement">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="id" type="xsd:string"/>
+            <xsd:element name="classes" type="classesElement" minOccurs="0"/>
+            <xsd:element name="flags" type="flagsElement" minOccurs="0"/>
+            <xsd:element name="properties" type="propertiesElement" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="tagsElement">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="graphic-tag" type="graphicTagElement"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="featureFlagsElement">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="feature-flag" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="tileRendererElement" mixed="true">
+        <xsd:all>
+            <xsd:element name="author" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="documentation" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="version" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="data-sets" type="dataSetsElement" minOccurs="0"/>
+            <xsd:element name="tags" type="tagsElement" minOccurs="0"/>
+            <xsd:element name="layers" type="layersElement" minOccurs="0"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:element name="tile-renderer" type="tileRendererElement"/>
+
+</xsd:schema> 

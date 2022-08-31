@@ -1,0 +1,46 @@
+﻿type: "TileSet"
+author: "Me"
+version: "1.0.0"
+
+tile-shape: isometric
+tile-size:
+    width: 64
+    height: 32
+
+    # includes:
+    #   - "data/otherfile.yaml"
+
+texture-files:
+    -   name: FileA
+        # Optional
+        default-cell-size:
+            width: 64
+            height: 32
+        grids:
+            -   id: "My grid"
+                grid-origin:
+                    x: 0
+                    y: 0
+                # Optional
+                cell-size:
+                    width: 64
+                    height: 32
+                cell-padding:
+                    width: 1
+                    height: 1
+                cell-anchor:
+                    x: 32
+                    y: 16
+                tiles:
+                    -   name: tile-a
+                        # Optional
+                        cell-anchor:
+                            x: 32
+                            y: 16
+                        position:
+                            x: 0
+                            y: 0
+                        tags:
+                            - tile-alias1
+                            - tile-alias2
+          

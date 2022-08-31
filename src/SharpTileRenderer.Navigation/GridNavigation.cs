@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharpTileRenderer.Navigation.Navigators;
+using System;
 
 namespace SharpTileRenderer.Navigation
 {
@@ -6,7 +7,7 @@ namespace SharpTileRenderer.Navigation
     {
         public static MapCoordinate[] NavigateNeighbours(this IMapNavigator<GridDirection> nav,
                                                          MapCoordinate coord,
-                                                         MapCoordinate[] retval = null)
+                                                         MapCoordinate[]? retval = null)
         {
             if (retval == null || retval.Length < 8)
             {
@@ -26,7 +27,7 @@ namespace SharpTileRenderer.Navigation
 
         public static MapCoordinate[] NavigateCardinalNeighbours(this IMapNavigator<GridDirection> nav,
                                                                  MapCoordinate coord,
-                                                                 MapCoordinate[] retval = null)
+                                                                 MapCoordinate[]? retval = null)
         {
             if (retval == null || retval.Length < 4)
             {
@@ -42,21 +43,49 @@ namespace SharpTileRenderer.Navigation
 
         public static IMapNavigator<GridDirection> CreateNavigator(GridType type)
         {
-            switch (type)
+            return type switch
             {
-                case GridType.Grid:
-                    return new GridNavigator();
-                case GridType.IsoStaggered:
-                    return new IsoStaggeredGridNavigator();
-                case GridType.IsoDiamond:
-                    return new IsoDiamondGridNavigator();
-                case GridType.Hex:
-                    throw new ArgumentException("Hex is not a supported grid navigation schema.");
-                case GridType.HexDiamond:
-                    throw new ArgumentException("Hex is not a supported grid navigation schema.");
-                default:
-                    throw new ArgumentOutOfRangeException();
+                GridType.Grid => new GridNavigator(),
+                GridType.IsoStaggered => new IsoStaggeredGridNavigator(),
+                GridType.IsoDiamond => new IsoDiamondGridNavigator(),
+                GridType.Hex => throw new ArgumentException("Hex is not a supported grid navigation schema."),
+                GridType.HexDiamond => throw new ArgumentException("Hex is not a supported grid navigation schema."),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+
+        public static IMapNavigator<GridDirection> BuildNavigator(this NavigatorMetaData md)
+        {
+            var root = GridNavigation.CreateNavigator(md.GridType);
+            if (md.HorizontalBorderOperation == md.VerticalBorderOperation)
+            {
+                root = md.HorizontalBorderOperation switch
+                {
+                    MapBorderOperation.None => root,
+                    MapBorderOperation.Limit => root.Limit(md.HorizontalRange.Value, md.VerticalRange.Value),
+                    MapBorderOperation.Wrap => root.Wrap(md.HorizontalRange.Value, md.VerticalRange.Value),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
             }
+            else
+            {
+                root = md.HorizontalBorderOperation switch
+                {
+                    MapBorderOperation.None => root,
+                    MapBorderOperation.Limit => root.LimitHorizontal(md.HorizontalRange.Value),
+                    MapBorderOperation.Wrap => root.WrapHorizontal(md.HorizontalRange.Value),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                root = md.VerticalBorderOperation switch
+                {
+                    MapBorderOperation.None => root,
+                    MapBorderOperation.Limit => root.LimitHorizontal(md.VerticalRange.Value),
+                    MapBorderOperation.Wrap => root.WrapHorizontal(md.VerticalRange.Value),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+            }
+
+            return root;
         }
 
         public static MapCoordinate NavigateUnconditionally(this IMapNavigator<GridDirection> nav,

@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<tile-set xmlns="https://docs.rabbit-stew-dio.com/xml-schema/texturepack/v1/">
+  <collection id="amplio/nuke">
+    <grid name="main" x="0" y="0" cell-width="180" cell-height="176" cell-spacing="0">
+      <tile x="0" y="0">
+        <tag>explode.nuke</tag>
+      </tile>
+    </grid>
+  </collection>
+</tile-set>

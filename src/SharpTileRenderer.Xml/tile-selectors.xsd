@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema version="4.0"
+            elementFormDefault="qualified"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:tm="https://docs.rabbit-stew-dio.com/xml-schema/tilematcher/v1/"
+            xmlns:ts="https://docs.rabbit-stew-dio.com/xml-schema/tileselector/v1/"
+            targetNamespace="https://docs.rabbit-stew-dio.com/xml-schema/tileselector/v1/">
+
+    <xsd:complexType name="matchesElement">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="class" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="basic" substitutionGroup="tm:matcherAbstract">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="tm:matcherElement">
+                    <xsd:sequence>
+                        <xsd:element name="prefix" type="xsd:string" minOccurs="0"/>
+                        <xsd:element name="suffix" type="xsd:string" minOccurs="0"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="blend" substitutionGroup="tm:matcherAbstract">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="tm:matcherElement">
+                    <xsd:sequence>
+                        <xsd:element name="prefix" type="xsd:string" minOccurs="0"/>
+                        <xsd:element name="context-data-set" type="xsd:string"/>
+                        <xsd:element name="match-self" type="matchesElement"/>
+                        <xsd:element name="match-with" type="matchesElement"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="corner" substitutionGroup="tm:matcherAbstract">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="tm:matcherElement">
+                    <xsd:all>
+                        <xsd:element name="prefix" type="xsd:string" minOccurs="0"/>
+                        <xsd:element name="context-data-set" type="xsd:string"/>
+                        <xsd:element name="default-class" type="xsd:string" minOccurs="0"/>
+                        <xsd:element name="matches" type="ts:matchesElement"/>
+                    </xsd:all>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="cell-group" substitutionGroup="tm:matcherAbstract">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="tm:matcherElement">
+                    <xsd:all>
+                        <xsd:element name="prefix" type="xsd:string"/>
+                        <xsd:element name="context-data-set" type="xsd:string"/>
+                        <xsd:element name="default-class" type="xsd:string" minOccurs="0"/>
+                        <xsd:element name="matches" type="ts:matchesElement"/>
+                    </xsd:all>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="cardinal" substitutionGroup="tm:matcherAbstract">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="tm:matcherElement">
+                    <xsd:all>
+                        <xsd:element name="prefix" type="xsd:string" minOccurs="0"/>
+                        <xsd:element name="context-data-set" type="xsd:string"/>
+                        <xsd:element name="match-self" type="matchesElement"/>
+                        <xsd:element name="match-with" type="matchesElement"/>
+                    </xsd:all>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="neighbour-overlay" substitutionGroup="tm:matcherAbstract">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="tm:matcherElement">
+                    <xsd:all>
+                        <xsd:element name="prefix" type="xsd:string" minOccurs="0"/>
+                        <xsd:element name="context-data-set" type="xsd:string"/>
+                        <xsd:element name="match-self" type="matchesElement"/>
+                        <xsd:element name="match-with" type="matchesElement"/>
+                    </xsd:all>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="river-outlet" substitutionGroup="tm:matcherAbstract">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="tm:matcherElement">
+                    <xsd:all>
+                        <xsd:element name="prefix" type="xsd:string" minOccurs="0"/>
+                        <xsd:element name="context-data-set" type="xsd:string"/>
+                        <xsd:element name="match-self" type="matchesElement"/>
+                        <xsd:element name="match-with" type="matchesElement"/>
+                    </xsd:all>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="road-corner" substitutionGroup="tm:matcherAbstract">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="tm:matcherElement">
+                    <xsd:all>
+                        <xsd:element name="prefix" type="xsd:string" minOccurs="0"/>
+                        <xsd:element name="context-data-set" type="xsd:string"/>
+                        <xsd:element name="match-self" type="matchesElement"/>
+                        <xsd:element name="match-with" type="matchesElement"/>
+                    </xsd:all>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="road-parity" substitutionGroup="tm:matcherAbstract">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="tm:matcherElement">
+                    <xsd:all>
+                        <xsd:element name="prefix" type="xsd:string" minOccurs="0"/>
+                        <xsd:element name="context-data-set" type="xsd:string"/>
+                        <xsd:element name="match-self" type="matchesElement"/>
+                        <xsd:element name="match-with" type="matchesElement"/>
+                    </xsd:all>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="diagonal" substitutionGroup="tm:matcherAbstract">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="tm:matcherElement">
+                    <xsd:all>
+                        <xsd:element name="prefix" type="xsd:string" minOccurs="0"/>
+                        <xsd:element name="context-data-set" type="xsd:string"/>
+                        <xsd:element name="match-self" type="matchesElement"/>
+                        <xsd:element name="match-with" type="matchesElement"/>
+                    </xsd:all>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="list" substitutionGroup="tm:matcherAbstract">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="tm:matcherElement">
+                    <xsd:sequence>
+                        <xsd:element name="selectors" type="ts:selectorElement" maxOccurs="unbounded"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="choiceMatchesElement">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="graphic-tag" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="choiceSelectionElement">
+        <xsd:sequence>
+            <xsd:element ref="tm:matcherAbstract" maxOccurs="1"/>
+            <xsd:element name="choice-matches" type="ts:choiceMatchesElement"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="choice" substitutionGroup="tm:matcherAbstract">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="tm:matcherElement">
+                    <xsd:sequence maxOccurs="unbounded">
+                        <xsd:element name="choice-selection" type="ts:choiceSelectionElement"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="quantityChoiceSelectionElement">
+        <xsd:sequence>
+            <xsd:element ref="tm:matcherAbstract"/>
+            <xsd:element name="quantity" type="xsd:int"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="quantity-choice" substitutionGroup="tm:matcherAbstract">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="tm:matcherElement">
+                    <xsd:sequence maxOccurs="unbounded">
+                        <xsd:element name="quantity-selection" type="ts:quantityChoiceSelectionElement"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="selectorElement">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element ref="tm:matcherAbstract"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+</xsd:schema>

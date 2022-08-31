@@ -1,0 +1,197 @@
+﻿kind: "Selector-Specification"
+author: "Me"
+version: "1.0.0"
+
+#
+# Data set declarations serve as both documentation and (potentially) as
+# template for an internal game data query engine. 
+data-sets:
+    -   id: OceanDataSet
+        type: class-set
+        classes: [ "land", "shallow", "deep" ]
+        default-class: "land"
+
+    -   id: ShoreDataSet
+        type: class-set
+        classes: [ "land", "water", "ice" ]
+        default-class: "land"
+
+    -   id: TerrainGraphicIdMapping
+        type: sparse-tag-map
+
+    -   id: ImprovementGraphicIdMapping
+        type: sparse-tag-map
+
+    -   id: ResourceGraphicIdMapping
+        type: sparse-tag-map
+
+    -   id: RiverDataSet
+        type: class-set
+        classes: [ "river", "water", "other" ]
+        default-class: "other"
+
+    -   id: RoadDataSet
+        type: class-set
+        classes: [ "rail", "road", "none" ]
+        default-class: "none"
+
+    -   id: CitiesDataSet
+        type: qantified-tag-map
+        classes:
+            - "city.asian_wall"
+            - "city.asian_city"
+            - "city.tropical_wall"
+            - "city.tropical_city"
+            - "city.celtic_wall"
+            - "city.celtic_city"
+            - "city.classical_wall"
+            - "city.classical_city"
+            - "city.babylonian_wall"
+            - "city.babylonian_city"
+            - "village"
+            - "none"
+        default-class: "none"
+        default-quantity: 0
+
+    -   id: FogOfWarDataSet
+        type: class-set
+        classes: [ "hidden", "seen", "visible" ]
+        default-class: "hidden"
+
+    -   id: UnitsDataSet
+        type: sparse-tag-map
+
+layers:
+    -   id: oceans
+        entity-source:
+            id: default-grid-scan
+            query-type: grid
+            sorting-order: top-down-left-right
+        match:
+            match-type: cellgroup
+            match-dataset: "OceanDataSet"
+
+    -   id: shores
+        entity-source:
+            id: "ShoreDataSet"
+            query-type: grid
+            sorting-order: top-down-left-right
+        match:
+            match-type: corner
+            match-dataset: 
+
+    -   id: ground
+        entity-source:
+            query: "TerrainGraphicIdMapping"
+            query-type: grid
+            sorting-order: top-down-left-right
+        match:
+            match-type: direct
+
+    -   id: blending
+        entity-source:
+            query: "TerrainGraphicIdMapping"
+            query-type: grid
+            sorting-order: top-down-left-right
+        match:
+            match-type: blending
+            blending-source:
+                id: blending-source
+                match-type: basic
+                match-dataset: TerrainGraphicIdMapping
+
+    -   id: resources
+        entity-source:
+            query: "ResourceGraphicIdMapping"
+            query-type: grid
+            sorting-order: top-down-left-right
+        match:
+            match-type: basic
+
+    -   id: river
+        entity-source:
+            query: "RiverDataSet"
+            query-type: grid
+            sorting-order: top-down-left-right
+        match:
+            match-type: list
+            layers:
+                -   id: river-body
+                    match-type: cardinal
+                    match-self: "river"
+                    match-other: [ "river", "water" ]
+
+                -   id: river-outlet
+                    match-type: cardinal
+                    match-self: "water"
+                    match-other: [ "river" ]
+
+    -   id: roads
+        entity-source:
+            query: RoadDataSet
+            query-type: grid
+            sorting-order: top-down-left-right
+        match:
+            match-type: list
+            layers:
+                -   id: road-main
+                    prefix: "road.road"
+                    match-type: separate-neighbours
+                    match-class: [ "road" ]
+                    match-other: [ "road", "railway" ]
+                    
+                -   id: road-corner
+                    prefix: "road.road"
+                    match-type: road-corner
+                    match-class: [ "road", "railway" ]
+
+    -   id: railway
+        entity-source:
+            query: "RoadDataSet"
+            query-type: grid
+            sorting-order: top-down-left-right
+        match:
+            prefix: "road.railway"
+            match-type: separate-neighbours
+            match-class: [ "railway" ]
+
+    -   id: improvements
+        entity-source:
+            query: "ImprovementGraphicIdMapping"
+            query-type: grid
+            sorting-order: top-down-left-right
+        match:
+            match-type: basic
+
+    -   id: settlement
+        entity-source:
+            query: CitiesDataSet
+            query-type: sparse
+            sorting-order: top-down-left-right
+        match:
+            match-type: list
+            layers:
+                -   id: city-icons
+                    match-type: quantified
+                    match-dataset: CitiesDataSet
+
+                -   id: city-names
+                    match-type: quantified
+                    match-dataset: CitiesDataSet
+                    renderer: city-name-renderer
+
+    -   id: units
+        entity-source:
+            query: UnitsDataSet
+            query-type: sparse
+            sorting-order: top-down-left-right
+        match:
+            match-type: basic
+
+    -   id: fog-of-war
+        entity-source:
+            query: FogOfWarDataSet
+            query-type: sparse
+            sorting-order: top-down-left-right
+        match:
+            match-type: cellgroup

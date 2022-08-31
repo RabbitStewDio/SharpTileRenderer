@@ -1,0 +1,22 @@
+author: "Me"
+documentation: "This is a sample render pipeline"
+version: "1.0.0"
+
+render-layers:
+  - id: "layer 1"
+    entity-source: 
+      - entity-query-id: "query"
+        sorting-order: top-down-left-right
+        layer-query-type: grid
+    match:
+      kind: basic
+      prefix: "t."
+      
+tags:
+  - id: "a tag"
+    Flags: 
+        - "flag-a"
+    Classes: 
+        - "class-a"
+    Properties:
+        key: value

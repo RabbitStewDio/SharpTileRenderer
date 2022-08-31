@@ -4,6 +4,12 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +19,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SharpTileRenderer.Navigation\SharpTileRenderer.Navigation.csproj" />
+    <ProjectReference Include="..\..\src\SharpTileRenderer\SharpTileRenderer.csproj" />
+    <ProjectReference Include="..\..\src\SharpTileRenderer.Xml\SharpTileRenderer.Xml.csproj" />
+    <ProjectReference Include="..\..\src\SharpTileRenderer.Yaml\SharpTileRenderer.Yaml.csproj" />
+
+    <ProjectReference Include="..\..\src\SharpTileRenderer.Drawing\SharpTileRenderer.Drawing.csproj" />
   </ItemGroup>
 
 </Project>

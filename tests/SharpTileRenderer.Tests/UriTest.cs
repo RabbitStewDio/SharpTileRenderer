@@ -1,5 +1,7 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using System;
+using System.IO;
 
 namespace SharpTileRenderer.Tests
 {
@@ -12,7 +14,24 @@ namespace SharpTileRenderer.Tests
             var x = new Uri("../test", UriKind.Relative);
 
             var r = new Uri(b, x);
-            Console.WriteLine(r.AbsolutePath);
+            r.AbsolutePath.Should().Be("/test");
+            try
+            {
+                // ReSharper disable once ObjectCreationAsStatement
+                new UriBuilder(x);
+                Assert.Fail();
+            }
+            catch (InvalidOperationException e)
+            {
+                
+            }
+        }
+
+        [Test]
+        public void ResolveTest()
+        {
+            Console.WriteLine(Path.Combine("test.xml", ".."));
+            Console.WriteLine(Path.GetRelativePath(".", Path.Combine("test.xml", "../test")));
         }
     }
 }

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharpTileRenderer.Drawing\SharpTileRenderer.Drawing.csproj" />
+    <ProjectReference Include="..\SharpTileRenderer\SharpTileRenderer.csproj" />
+    <ProjectReference Include="..\SharpTileRenderer.Xml\SharpTileRenderer.Xml.csproj" />
+    <ProjectReference Include="..\SharpTileRenderer.Yaml\SharpTileRenderer.Yaml.csproj" />
+  </ItemGroup>
+
+</Project>

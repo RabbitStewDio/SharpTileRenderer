@@ -1,5 +1,7 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using SharpTileRenderer.Navigation;
+using SharpTileRenderer.Navigation.Navigators;
 using System.Collections.Generic;
 
 namespace SharpTileRenderer.Tests.Navigation
@@ -28,6 +30,18 @@ namespace SharpTileRenderer.Tests.Navigation
         {
             var nav = new GridNavigator();
             TestData.ValidateAll(nav);
+        }
+
+        [Test]
+        public void ValidateWrappingNormalization()
+        {
+            var nav = NavigatorMetaData.FromGridType(GridType.Grid).WithHorizontalWrap(10).WithVerticalLimit(5).BuildNavigator();
+            nav.Navigate(GridDirection.None, new MapCoordinate(-5, -5), out var resultCoord, out var navigationInfo).Should().BeFalse();
+            navigationInfo.LimitedX.Should().BeFalse();
+            navigationInfo.LimitedY.Should().BeTrue();
+            navigationInfo.WrapXIndicator.Should().Be(-1);
+            navigationInfo.WrapYIndicator.Should().Be(0);
+            resultCoord.Should().Be(new MapCoordinate(5, -5));
         }
     }
 }

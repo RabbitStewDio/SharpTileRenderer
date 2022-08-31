@@ -12,7 +12,7 @@ namespace SharpTileRenderer.Tests.Navigation
         {
             var input = new MapCoordinate(99, 0);
             var nav = new TestNavigator();
-            nav.Expect((GridDirection.East, input, 1), 
+            nav.ExpectNavigateTo((GridDirection.East, input, 1), 
                 (true, new MapCoordinate(100, 0)));
 
             var w = nav.Wrap(new Range(0, 100), new Range(0, 100));
@@ -25,7 +25,7 @@ namespace SharpTileRenderer.Tests.Navigation
         {
             var input = new MapCoordinate(99, 0);
             var nav = new TestNavigator();
-            nav.Expect((GridDirection.North, input, 1), 
+            nav.ExpectNavigateTo((GridDirection.North, input, 1), 
                        (true, new MapCoordinate(99, -1)));
 
             var w = nav.Wrap(new Range(0, 100), new Range(0, 100));

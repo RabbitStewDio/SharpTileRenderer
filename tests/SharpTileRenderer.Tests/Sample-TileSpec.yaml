@@ -1,0 +1,176 @@
+﻿type: "Selector-Specification"
+author: "Me"
+version: "1.0.0"
+
+data-sets:
+    -   id: OceanDataSet
+        type: class-set
+        classes: [ "land", "shallow", "deep" ]
+        default-class: "land"
+
+    -   id: ShoreDataSet
+        type: class-set
+        classes: [ "land", "water", "ice" ]
+        default-class: "land"
+
+    -   id: TerrainGraphicIdMapping
+        type: sparse-tag-map
+
+    -   id: ResourceGraphicIdMapping
+        type: sparse-tag-map
+
+    -   id: RiverDataSet
+        type: class-set
+        classes: [ "river", "water", "other" ]
+        default-class: "other"
+
+    -   id: RoadDataSet
+        type: class-set
+        classes: [ "rail", "road", "none" ]
+        default-class: "none"
+
+    -   id: CitiesDataSet
+        type: qantified-tag-map
+        classes:
+            - "city.asian_wall"
+            - "city.asian_city"
+            - "city.tropical_wall"
+            - "city.tropical_city"
+            - "city.celtic_wall"
+            - "city.celtic_city"
+            - "city.classical_wall"
+            - "city.classical_city"
+            - "city.babylonian_wall"
+            - "city.babylonian_city"
+            - "village"
+            - "none"
+        default-class: "none"
+        default-quantity: 0
+
+    -   id: FogOfWarDataSet
+        type: class-set
+        classes: [ "hidden", "seen", "visible" ]
+        default-class: "hidden"
+
+    -   id: UnitsDataSet
+        type: sparse-tag-map
+
+layer-defaults:
+    entity-source: 
+        id: default-grid-scan
+        source-type: grid
+        sorting-order: top-down-left-right
+
+layers:
+    -   id: oceans
+        match:
+            match-type: cellgroup
+            match-dataset: "OceanDataSet"
+
+    -   id: shores
+        match:
+            match-type: corner
+            match-dataset: "ShoreDataSet"
+
+    -   id: ground
+        entity-source:
+            id: TerrainGraphicIdMapping
+            source-type: sprite-query
+            sorting-order: top-down-left-right
+        match:
+            match-type: direct
+
+    -   id: blending
+        match:
+            match-type: blending
+            blending-source:
+                id: blending-source
+                match-type: basic
+                match-dataset: TerrainGraphicIdMapping
+
+    -   id: resources
+        entity-source:
+            id: ResourceGraphicIdMapping
+            source-type: sprite-query
+            sorting-order: top-down-left-right
+        match:
+            match-type: basic
+
+    -   id: river
+        entity-source:
+            id: RiverDataSet
+            source-type: class-query
+            sorting-order: top-down-left-right
+        match:
+            match-type: list
+            layers:
+                -   id: river-body
+                    match-type: cardinal
+                    match-self: "river"
+                    match-other: [ "river", "water" ]
+                    match-dataset: RiverDataSet
+
+                -   id: river-outlet
+                    match-type: cardinal
+                    match-self: "water"
+                    match-other: [ "river" ]
+                    match-dataset: RiverDataSet
+
+    -   id: roads
+        prefix: "road.road"
+        entity-source:
+            id: RoadDataSet
+            source-type: class-query
+            sorting-order: top-down-left-right
+        match:
+            match-type: separate-neighbours
+            match-class: [ "road" ]
+
+    -   id: railway
+        prefix: "road.railway"
+        entity-source:
+            id: RoadDataSet
+            source-type: class-query
+            sorting-order: top-down-left-right
+        match:
+            match-type: separate-neighbours
+            match-class: [ "railway" ]
+
+    -   id: improvements
+        entity-source:
+            id: ImprovementGraphicIdMapping
+            source-type: sprite-query
+            sorting-order: top-down-left-right
+        match:
+            match-type: basic
+
+    -   id: settlement
+        entity-source:
+            id: city-query
+            source-type: entity-query
+            sorting-order: top-down-left-right
+        match:
+            match-type: list
+            layers:
+                -   id: city-icons
+                    match-type: quantified
+                    match-dataset: CitiesDataSet
+                    
+                -   id: city-names
+                    match-type: quantified
+                    match-dataset: CitiesDataSet
+                    renderer: city-name-renderer
+
+    -   id: units
+        entity-source:
+            id: unit-query
+            source-type: entity-query
+            sorting-order: top-down-left-right
+        match:
+            match-type: custom
+            renderer: UnitRenderer
+
+    -   id: fog-of-war
+        match:
+            match-type: cellgroup
+            match-dataset: FogOfWarDataSet

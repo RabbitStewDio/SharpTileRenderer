@@ -1,0 +1,129 @@
+﻿using FluentAssertions;
+using NUnit.Framework;
+using SharpTileRenderer.Navigation;
+using SharpTileRenderer.Tests.Fixtures;
+using SharpTileRenderer.TileMatching;
+using SharpTileRenderer.TileMatching.DataSets;
+using SharpTileRenderer.TileMatching.Model.Selectors;
+using SharpTileRenderer.TileMatching.Selectors;
+using System.Collections.Generic;
+
+namespace SharpTileRenderer.Tests.TileMatching
+{
+    public class CornerSelectorTest: SelectorTestBase<CornerSelectorModel>
+    {
+        protected override ITileDataSet<GraphicTag, Unit> CreateDataSet()
+        {
+            //      .B.
+            //      $AC
+            //      .BA
+            return ArrayDataSet.CreateBasicTagDataSet<Unit>(20, 20)
+                               .WithDataAt(0, 0, 0, new GraphicTag("tag-A"))
+                               .WithDataAt(5, 5, 0, new GraphicTag("tag-A"))
+                               .WithDataAt(6, 6, 0, new GraphicTag("tag-A"))
+                               .WithDataAt(4, 5, 0, new GraphicTag("tag-$"))
+                               .WithDataAt(5, 4, 0, new GraphicTag("tag-B"))
+                               .WithDataAt(5, 6, 0, new GraphicTag("tag-B"))
+                               .WithDataAt(6, 5, 0, new GraphicTag("tag-C"));
+        }
+
+        protected override string SelectorKind => BuiltInSelectors.Corner;
+        protected override string XmlResult => @"<tile-set xmlns:ts=""https://docs.rabbit-stew-dio.com/xml-schema/tileselector/v1/"" xmlns=""https://docs.rabbit-stew-dio.com/xml-schema/tilematcher/v1/"">
+  <layers>
+    <layer>
+      <id>test-layer</id>
+      <enabled>true</enabled>
+      <ts:corner>
+        <ts:prefix>prefix.</ts:prefix>
+        <ts:context-data-set>context-data</ts:context-data-set>
+        <ts:matches>
+          <ts:class>A-class</ts:class>
+          <ts:class>B-class</ts:class>
+        </ts:matches>
+      </ts:corner>
+    </layer>
+  </layers>
+</tile-set>";
+        
+        protected override string YamlResult => @"kind: Selector-Specification
+renderLayers:
+  - id: test-layer
+    enabled: true
+    match:
+      kind: corner
+      prefix: prefix.
+      contextDataSet: context-data
+      matches:
+        - A-class
+        - B-class
+";
+
+        protected override (CornerSelectorModel, ISpriteMatcher<GraphicTag>) CreateSpriteMatcher()
+        {
+            var sm = new CornerSelectorModel()
+            {
+                Matches = { "A-class", "B-class" },
+                Prefix = "prefix.",
+                ContextDataSet = "context-data",
+                DefaultClass = "B-class"
+            };
+
+            var factory = new MatcherFactory<EntityClassification16>();
+            factory.WithDefaultMatchers();
+
+            var spriteMatcher = factory.CreateTagMatcher(sm, MatchFactoryContextFixture.FactoryContext);
+            return (sm, spriteMatcher);
+        }
+
+        [Test]
+        public void ValidateSelectorModelEquality()
+        {
+            var sm = new CornerSelectorModel();
+            sm.Equals(new CornerSelectorModel()).Should().BeTrue();
+
+            var sm2 = new CornerSelectorModel()
+            {
+                Matches = { "A-class", "B-class" },
+                Prefix = "prefix.",
+                ContextDataSet = "context-data"
+            };
+            sm2.Equals(new CornerSelectorModel()).Should().BeFalse();
+            sm2.Equals(new CornerSelectorModel() { Prefix = "prefix" }).Should().BeFalse();
+            sm2.Equals(new CornerSelectorModel()
+               {
+                   Matches = { "A-class", "B-class" },
+                   Prefix = "prefix.",
+                   ContextDataSet = "context-data"
+               })
+               .Should()
+               .BeTrue();
+        }
+
+        [Test]
+        public void ValidateSelectorMatch()
+        {
+            var (sm, spriteMatcher) = CreateSpriteMatcher();
+            var input = SpriteMatcherInput.From(GraphicTag.From("tag-A"), new ContinuousMapCoordinate(5f, 5f));
+            var resultCollector = new List<(SpriteTag tag, SpritePosition spriteOffset, ContinuousMapCoordinate pos)>();
+
+            spriteMatcher.Match(input, 0, resultCollector).Should().BeTrue();
+            resultCollector.Should()
+                           .BeEquivalentTo(
+                               (SpriteTag.Create(sm.Prefix, input.TagData.ToString(), "_cell_u_A_B_B"), SpritePosition.Up, input.Position),
+                               (SpriteTag.Create(sm.Prefix, input.TagData.ToString(), "_cell_r_B_B_B"), SpritePosition.Right, input.Position),
+                               (SpriteTag.Create(sm.Prefix, input.TagData.ToString(), "_cell_d_B_A_B"), SpritePosition.Down, input.Position),
+                               (SpriteTag.Create(sm.Prefix, input.TagData.ToString(), "_cell_l_B_B_A"), SpritePosition.Left, input.Position)
+                           );
+        }
+
+        [Test]
+        public void ValidateSelectorInvalid()
+        {
+            var (_, spriteMatcher) = CreateSpriteMatcher();
+            var input = SpriteMatcherInput.From(GraphicTag.From("invalid"), new ContinuousMapCoordinate(5f, 5f));
+            var resultCollector = new List<(SpriteTag tag, SpritePosition spriteOffset, ContinuousMapCoordinate pos)>();
+
+            spriteMatcher.Match(input, 0, resultCollector).Should().BeFalse();
+        }
+    }
+}

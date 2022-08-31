@@ -12,5 +12,15 @@ namespace SharpTileRenderer.Navigation
             Min = Math.Min(min, max);
             Max = Math.Max(min, max);
         }
+
+        public int Clamp(int value)
+        {
+            return Math.Min(Max, Math.Max(value, Min));
+        }
+
+        public float Clamp(float value)
+        {
+            return Math.Min(Max, Math.Max(value, Min));
+        }
     }
 }

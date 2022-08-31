@@ -1,0 +1,47 @@
+﻿<?xml version="1.0"?>
+<tile-set xmlns="https://docs.rabbit-stew-dio.com/xml-schema/tilematcher/v1/"
+          xmlns:ts="https://docs.rabbit-stew-dio.com/xml-schema/tileselector/v1/">
+    <author>asdasd</author>
+    <documentation>
+        Hi you.
+
+        This is documentation.
+    </documentation>
+    <version>1.0.0</version>
+
+    <data-sets>
+        <tag-data>
+            <id>layer-one-query</id>
+        </tag-data>
+        <class-set>
+            <id>layer-two-query</id>
+            <classes>
+                <class>ocean</class>
+                <class>shore</class>
+                <class>land</class>
+            </classes>
+            <default-class>ocean</default-class>
+        </class-set>
+    </data-sets>
+
+    <layers>
+        <layer>
+            <layer-id>Layer-One</layer-id>
+            <entity-source>
+                <entity-query-id>layer-one-query</entity-query-id>
+                <sort-order>top-down-left-right</sort-order>
+                <query-type>grid</query-type>
+            </entity-source>
+            <ts:basic/>
+        </layer>
+        <layer>
+            <layer-id>Layer-Two</layer-id>
+            <entity-source>
+                <entity-query-id>layer-one-query</entity-query-id>
+                <sort-order>top-down-left-right</sort-order>
+                <query-type>grid</query-type>
+            </entity-source>
+            <ts:basic/>
+        </layer>
+    </layers>
+</tile-set>
