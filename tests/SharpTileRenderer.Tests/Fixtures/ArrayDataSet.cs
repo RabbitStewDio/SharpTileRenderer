@@ -7,12 +7,8 @@ using System.Collections.Generic;
 
 namespace SharpTileRenderer.Tests.Fixtures
 {
-    public class TestDataSetProducer<TData, TClass> : ITileDataSetProducer<TData>
+    public class TestDataSetProducer<TData> : ITileDataSetProducer<TData>
     {
-        public TestDataSetProducer()
-        {
-        }
-
         public bool ContainsDataSet(string id)
         {
             return false;

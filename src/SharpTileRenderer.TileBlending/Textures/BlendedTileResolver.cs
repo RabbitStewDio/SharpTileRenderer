@@ -2,10 +2,8 @@
 using SharpTileRenderer.TexturePack.Operations;
 using SharpTileRenderer.TexturePack.Tiles;
 using SharpTileRenderer.TileMatching;
-using SharpTileRenderer.TileMatching.Selectors.BuiltIn;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SharpTileRenderer.TileBlending.Textures
 {
@@ -55,7 +53,7 @@ namespace SharpTileRenderer.TileBlending.Textures
             return true;
         }
 
-        public bool TryFind(SpriteTag tag, [MaybeNullWhen(false)] out TexturedTile<TTexture> tile)
+        public bool TryFind(SpriteTag tag, out TexturedTile<TTexture> tile)
         {
             if (generatedTiles.TryGetValue(tag, out tile))
             {
@@ -81,7 +79,7 @@ namespace SharpTileRenderer.TileBlending.Textures
         /// <param name="tag"></param>
         /// <param name="t"></param>
         /// <returns></returns>
-        bool TryFindBlendMask(string? tag, [MaybeNullWhen(false)] out TexturedTile<TTexture> t)
+        bool TryFindBlendMask(string? tag, out TexturedTile<TTexture> t)
         {
             if (tag != null)
             {

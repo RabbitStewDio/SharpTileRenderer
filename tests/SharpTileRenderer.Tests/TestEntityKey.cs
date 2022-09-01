@@ -9,7 +9,7 @@ namespace SharpTileRenderer.Tests
             return Id == other.Id;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is TestEntityKey other && Equals(other);
         }

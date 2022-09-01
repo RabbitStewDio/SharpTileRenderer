@@ -3,7 +3,6 @@ using SharpTileRenderer.TexturePack.Model;
 using SharpTileRenderer.TileMatching;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 

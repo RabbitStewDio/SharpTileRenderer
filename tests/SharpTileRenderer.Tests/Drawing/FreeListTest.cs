@@ -32,7 +32,7 @@ namespace SharpTileRenderer.Tests.Drawing
             var ix3 = fl.Add(3);
             ix3.Should().Be(ix0);
             
-            var ix4 = fl.Add(4);
+            fl.Add(4);
             fl.Count.Should().Be(4);
         }
     }
@@ -118,7 +118,7 @@ namespace SharpTileRenderer.Tests.Drawing
             var ix3 = fl.Add(new Payload(true, 3));
             ix3.Should().Be(ix0);
             
-            var ix4 = fl.Add(new Payload(true, 4));
+            fl.Add(new Payload(true, 4));
             fl.Count.Should().Be(4);
         }
     }

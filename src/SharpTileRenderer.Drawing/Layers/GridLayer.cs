@@ -77,7 +77,7 @@ namespace SharpTileRenderer.Drawing.Layers
 
                             if (tileBuffer.Count == 0 && queryBuffer.Count != 0)
                             {
-                                if (!warnNoRenderer.TryGetValue(queryBuffer[0].TagData, out var td))
+                                if (!warnNoRenderer.TryGetValue(queryBuffer[0].TagData, out _))
                                 {
                                     logger.Debug("{LayerName}: Skipped rendering of {Coordinate} for query result {QueryResult}", Name, pt, queryBuffer[0]);
                                     warnNoRenderer[queryBuffer[0].TagData] = true;

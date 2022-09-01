@@ -1,6 +1,4 @@
-﻿using SharpTileRenderer.Navigation;
-using SharpTileRenderer.TexturePack;
-using SharpTileRenderer.Util;
+﻿using SharpTileRenderer.Util;
 
 namespace SharpTileRenderer.TileMatching.Selectors.TileTags
 {

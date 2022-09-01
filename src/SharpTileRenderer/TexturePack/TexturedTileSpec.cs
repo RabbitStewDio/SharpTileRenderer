@@ -1,4 +1,5 @@
 ﻿using SharpTileRenderer.TileMatching;
+using SharpTileRenderer.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace SharpTileRenderer.TexturePack
             TextureAssetName = textureAssetName ?? throw new ArgumentNullException();
             Bounds = bounds;
             Anchor = anchor;
-            Tags = new ReadOnlyListWrapper<SpriteTag>(tags?.ToArray() ?? Array.Empty<SpriteTag>());
+            Tags = new ReadOnlyListWrapper<SpriteTag>(tags.ToArray());
         }
 
         public bool Equals(TexturedTileSpec other)

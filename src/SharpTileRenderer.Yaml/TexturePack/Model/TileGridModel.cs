@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SharpTileRenderer.Yaml.TexturePack.Model
 {
@@ -37,6 +38,7 @@ namespace SharpTileRenderer.Yaml.TexturePack.Model
         public PointModel? CellAnchor { get; set; }
 
         [UsedImplicitly]
+        [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract")]
         public List<TileDefinitionModel> Tiles
         {
             get
@@ -46,7 +48,6 @@ namespace SharpTileRenderer.Yaml.TexturePack.Model
             set
             {
                 tiles.Clear();
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 if (value != null)
                 {
                     tiles.Clear();

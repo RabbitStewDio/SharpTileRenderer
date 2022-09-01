@@ -7,6 +7,7 @@ using SharpTileRenderer.TileMatching.DataSets;
 using SharpTileRenderer.TileMatching.Model.DataSets;
 using SharpTileRenderer.TileMatching.Model.Selectors;
 using SharpTileRenderer.TileMatching.Selectors;
+using System;
 using System.Collections.Generic;
 
 namespace SharpTileRenderer.Tests.TileMatching
@@ -43,7 +44,7 @@ namespace SharpTileRenderer.Tests.TileMatching
             var factory = new MatcherFactory<EntityClassification16>();
             factory.WithDefaultMatchers();
 
-            var spriteMatcher = factory.CreateTagMatcher(sm, MatchFactoryContextFixture.FactoryContext);
+            var spriteMatcher = factory.CreateTagMatcher(sm, MatchFactoryContextFixture?.FactoryContext ?? throw new NullReferenceException());
             return (sm, spriteMatcher);
         }
 

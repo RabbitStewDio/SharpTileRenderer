@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using SharpTileRenderer.TexturePack;
 using SharpTileRenderer.Util;
 using System;
 using System.Collections.Generic;

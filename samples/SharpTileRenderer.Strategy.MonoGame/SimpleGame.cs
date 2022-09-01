@@ -125,13 +125,16 @@ namespace SharpTileRenderer.Strategy.MonoGame
     public class StrategyGameDataSets
     {
         readonly StrategyGame game;
-        readonly TileMatcherModel tileMatcherModel;
         readonly Dictionary<TerrainId, GraphicTag> terrainGraphicMap;
 
         public StrategyGameDataSets(StrategyGame game, TileMatcherModel tileMatcherModel)
         {
+            if (tileMatcherModel == null)
+            {
+                throw new ArgumentNullException(nameof(tileMatcherModel));
+            }
+
             this.game = game ?? throw new ArgumentNullException(nameof(game));
-            this.tileMatcherModel = tileMatcherModel ?? throw new ArgumentNullException(nameof(tileMatcherModel));
             this.terrainGraphicMap = new Dictionary<TerrainId, GraphicTag>();
 
             var tagMap = new HashSet<string>();
@@ -186,7 +189,7 @@ namespace SharpTileRenderer.Strategy.MonoGame
             }
 
             return new DefaultMapTileDataSet<TerrainData, Unit>(game.GameData.Terrain, TerrainToGraphicTag,
-                                                                u => new Unit());
+                                                                _ => new Unit());
         }
 
         public ITileDataSet<GraphicTag, Unit> CreateRiversDataSet()
@@ -206,7 +209,7 @@ namespace SharpTileRenderer.Strategy.MonoGame
             }
 
             return new DefaultMapTileDataSet<TerrainData, Unit>(game.GameData.Terrain, RiverToGraphicTag,
-                                                                u => new Unit());
+                                                                _ => new Unit());
         }
 
         public ITileDataSet<GraphicTag, Unit> CreateResourceDataSet()
@@ -224,7 +227,7 @@ namespace SharpTileRenderer.Strategy.MonoGame
             }
 
             return new DefaultMapTileDataSet<TerrainData, Unit>(game.GameData.Terrain, ResourceToGraphicTag,
-                                                                u => new Unit());
+                                                                _ => new Unit());
         }
 
         public ITileDataSet<GraphicTag, Unit> CreateImprovementsDataSet()
@@ -241,7 +244,7 @@ namespace SharpTileRenderer.Strategy.MonoGame
             }
 
             return new DefaultMapTileDataSet<TerrainData, Unit>(game.GameData.Terrain, ImprovementToGraphicTag,
-                                                                u => new Unit());
+                                                                _ => new Unit());
         }
 
         public ITileDataSet<GraphicTag, Unit> CreateRoadDataSet()
@@ -254,7 +257,7 @@ namespace SharpTileRenderer.Strategy.MonoGame
             }
 
             return new DefaultMapTileDataSet<TerrainData, Unit>(game.GameData.Terrain, RoadToGraphicTag,
-                                                                u => new Unit());
+                                                                _ => new Unit());
         }
 
         public ITileDataSet<GraphicTag, Unit> CreateFogDataSet()
@@ -267,7 +270,7 @@ namespace SharpTileRenderer.Strategy.MonoGame
             }
 
             return new DefaultMapTileDataSet<FogState, Unit>(game.FogData.Fog, FogToGraphicTag,
-                                                             u => new Unit());
+                                                             _ => new Unit());
         }
 
         public IQuantifiedTagTileDataSet<GraphicTag, Settlement?, int> CreateCitiesDataSet()

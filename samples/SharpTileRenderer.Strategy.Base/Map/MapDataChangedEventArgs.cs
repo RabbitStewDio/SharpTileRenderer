@@ -1,6 +1,4 @@
-﻿using SharpTileRenderer.Strategy.Base.Model;
-
-namespace SharpTileRenderer.Strategy.Base.Map
+﻿namespace SharpTileRenderer.Strategy.Base.Map
 {
     public readonly struct MapDataChangedEventArgs
     {

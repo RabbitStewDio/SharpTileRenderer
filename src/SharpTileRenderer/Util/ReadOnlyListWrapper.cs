@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
-namespace SharpTileRenderer.TexturePack
+namespace SharpTileRenderer.Util
 {
     [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
     public readonly struct ReadOnlyListWrapper<T> : IReadOnlyList<T>, ICollection<T>

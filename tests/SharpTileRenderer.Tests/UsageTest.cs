@@ -17,6 +17,7 @@ using SharpTileRenderer.TileMatching.Selectors;
 using SharpTileRenderer.Yaml.TexturePack;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -68,6 +69,7 @@ namespace SharpTileRenderer.Tests
                     .Build(parameters.DataSets, parameters.Renderer);
         }
 
+        [SuppressMessage("ReSharper", "ReturnValueOfPureMethodIsNotUsed")]
         public void SampleUsage()
         {
             // provided via the global infrastructure
@@ -76,7 +78,7 @@ namespace SharpTileRenderer.Tests
             // tiles are what is rendered. This is somewhat independent from the rest of the library
             // and builds a repository of renderable elements. 
             var tiles = LoadTileSet(contentLoader);
-            var tileProducer = new TileProducer<Texture>(null);
+            var tileProducer = new TileProducer<Texture>(null!);
             var spriteTiles = new SpriteTagTileResolver<TexturedTile<Texture>>(default);
             spriteTiles.Populate(tileProducer, contentLoader, tiles);
             var renderer = new TestRenderer(spriteTiles);
@@ -98,7 +100,7 @@ namespace SharpTileRenderer.Tests
 
             var parameters = new LayerFactoryParameters<EntityClassification32, TestEntityKey>(model.DataSets, matcherFactory,
                                                                                                matcherFactoryContext, renderer, dataSets);
-            var layers = model.RenderLayers.Select(l => CreateLayerInGenericFashion(l, parameters));
+            model.RenderLayers.Select(l => CreateLayerInGenericFashion(l, parameters));
             var (layer, layer2) = CreateLayersManually(parameters, model.RenderLayers);
 
             var viewPort = new ViewPort(navConfig, tiles.TileShape, tiles.TileSize)

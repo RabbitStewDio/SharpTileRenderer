@@ -1,5 +1,4 @@
-﻿using SharpTileRenderer.TexturePack;
-using SharpTileRenderer.Util;
+﻿using SharpTileRenderer.Util;
 using System;
 
 namespace SharpTileRenderer.Navigation

@@ -5,7 +5,7 @@ namespace SharpTileRenderer.Yaml.TexturePack.Model
 {
     public class TileDefinitionModel
     {
-        public string? Tag { get; }
+        public string? Tag { get; set;  }
         public PointModel? CellAnchor { get; set; }
         [Required]
         public PointModel? Position { get; set; }

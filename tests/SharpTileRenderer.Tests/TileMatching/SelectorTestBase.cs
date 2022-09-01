@@ -42,7 +42,7 @@ namespace SharpTileRenderer.Tests.TileMatching
     public abstract class SelectorTestBase<TSelector>
         where TSelector: ISelectorModel
     {
-        protected MatchFactoryContextFixture MatchFactoryContextFixture;
+        protected MatchFactoryContextFixture? MatchFactoryContextFixture;
 
         [SetUp]
         public void SetUp()

@@ -10,7 +10,6 @@ namespace SharpTileRenderer.Tests.Drawing
     [TestFixture]
     public class QueryPlanerTest
     {
-        readonly GridType gridType;
         readonly TileShape tileShape;
         readonly IQueryPlaner planer;
         readonly NavigatorMetaData navigatorMetaData;
@@ -21,7 +20,6 @@ namespace SharpTileRenderer.Tests.Drawing
 
         public QueryPlanerTest(GridType gridType, TileShape tileShape)
         {
-            this.gridType = gridType;
             this.tileShape = tileShape;
             this.planer = QueryPlaner.FromTileType(gridType);
             this.navigatorMetaData = NavigatorMetaData.FromGridType(gridType);

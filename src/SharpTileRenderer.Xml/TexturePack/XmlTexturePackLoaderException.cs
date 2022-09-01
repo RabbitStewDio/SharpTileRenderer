@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Xml;
@@ -14,10 +13,10 @@ namespace SharpTileRenderer.Xml.TexturePack
         public XmlTexturePackLoaderException(string message) : base(message)
         { }
 
-        public XmlTexturePackLoaderException(string message, IXmlLineInfo lineInfo) : base(AppendLineInfo(message, lineInfo))
+        public XmlTexturePackLoaderException(string message, IXmlLineInfo? lineInfo) : base(AppendLineInfo(message, lineInfo))
         { }
 
-        static string AppendLineInfo(string message, IXmlLineInfo lineInfo)
+        static string AppendLineInfo(string message, IXmlLineInfo? lineInfo)
         {
             if (lineInfo?.HasLineInfo() == true)
             {
@@ -33,7 +32,7 @@ namespace SharpTileRenderer.Xml.TexturePack
         public XmlTexturePackLoaderException(string message, Exception innerException) : base(message, innerException)
         { }
 
-        protected XmlTexturePackLoaderException([NotNull] SerializationInfo info, StreamingContext context) : base(info, context)
+        protected XmlTexturePackLoaderException(SerializationInfo info, StreamingContext context) : base(info, context)
         { }
     }
 }

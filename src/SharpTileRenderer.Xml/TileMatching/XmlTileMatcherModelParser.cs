@@ -7,7 +7,6 @@ using SharpTileRenderer.TileMatching.Model.Selectors;
 using SharpTileRenderer.Util;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Xml.Linq;
 
 namespace SharpTileRenderer.Xml.TileMatching

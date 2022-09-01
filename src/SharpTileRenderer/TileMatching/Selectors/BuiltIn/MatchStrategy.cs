@@ -48,7 +48,7 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
 
                 if (logger.IsEnabled(LogEventLevel.Debug))
                 {
-                    logger.Debug("Failed match at {c} for {q}", c, queryBuffer);
+                    logger.Debug("Failed match at {Coordinate} for {QueryResult}", c, queryBuffer);
                 }
                 return defaultValue.TryGetValue(out match);
             }

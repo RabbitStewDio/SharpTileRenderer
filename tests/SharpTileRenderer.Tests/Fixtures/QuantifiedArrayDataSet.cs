@@ -22,6 +22,18 @@ namespace SharpTileRenderer.Tests.Fixtures
             entityData = new Dictionary<int, Optional<(TData, TEntity, TQuantity)>[]>();
         }
 
+        public QuantifiedArrayDataSet<TData, TEntity, TQuantity> WithDataAt(int x, int y, int z, (TData data, TEntity entity, TQuantity q) e)
+        {
+            if (!entityData.TryGetValue(z, out var data))
+            {
+                data = new Optional<(TData, TEntity, TQuantity)>[width * height];
+                entityData[z] = data;
+            }
+
+            data[x + y * width] = e;
+            return this;
+        }
+
         public ITileDataSetMetaData MetaData { get; }
 
         public List<SparseTagQueryResult<TData, (TEntity, TQuantity)>> QuerySparse(in ContinuousMapArea area, int z, List<SparseTagQueryResult<TData, (TEntity, TQuantity)>>? result = null)

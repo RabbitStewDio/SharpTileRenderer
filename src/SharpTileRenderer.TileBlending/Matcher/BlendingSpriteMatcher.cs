@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.ObjectPool;
-using SharpTileRenderer.Drawing.Utils;
 using SharpTileRenderer.Navigation;
 using SharpTileRenderer.TileMatching;
 using SharpTileRenderer.TileMatching.DataSets;

@@ -17,7 +17,7 @@ namespace SharpTileRenderer.Tests.Navigation
 
             var w = nav.Limit(new Range(0, 100), new Range(0, 100));
 
-            w.NavigateTo(GridDirection.East, input, out var m, 1).Should().BeFalse();
+            w.NavigateTo(GridDirection.East, input, out var m).Should().BeFalse();
             m.Should().Be(new MapCoordinate(100, 0));
         }
     }

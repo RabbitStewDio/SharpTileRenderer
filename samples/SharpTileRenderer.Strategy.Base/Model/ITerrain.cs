@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SharpTileRenderer.Strategy.Base.Model
+﻿namespace SharpTileRenderer.Strategy.Base.Model
 {
     /// <summary>
     ///   A basic, freeciv inspired terrain definition.

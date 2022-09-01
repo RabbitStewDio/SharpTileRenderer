@@ -23,7 +23,7 @@ namespace SharpTileRenderer.TexturePack.Atlas
         {
             foreach (var b in builders)
             {
-                if (b.Insert(tile, out TTexture result))
+                if (b.Insert(tile, out var result))
                 {
                     return result;
                 }
@@ -33,7 +33,7 @@ namespace SharpTileRenderer.TexturePack.Atlas
                                                      new IntDimension(size, size));
             var b2 = new TextureAtlasBuilder<TTexture, TColor>(textureOperations, rt);
 
-            if (b2.Insert(tile, out TTexture result2))
+            if (b2.Insert(tile, out var result2))
             {
                 builders.Add(b2);
                 return result2;

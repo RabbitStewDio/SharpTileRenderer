@@ -1,6 +1,7 @@
 ﻿using SharpTileRenderer.Util;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.Serialization;
 
@@ -83,6 +84,7 @@ namespace SharpTileRenderer.TileMatching.Model.Meta
             return Equals((GraphicTagDefinitionModel)obj);
         }
 
+        [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
         public override int GetHashCode()
         {
             unchecked

@@ -53,13 +53,14 @@ namespace SharpTileRenderer.Strategy.Base
             get { return terrain; }
         }
 
-        public void AddSettlement(Settlement s)
+        public int AddSettlement(Settlement s)
         {
             var idx = Settlements.AddSettlement(s);
 
             var t = terrain[s.Location.X, s.Location.Y];
             t = t.WithSettlement(s.DataId);
             terrain[s.Location.X, s.Location.Y] = t;
+            return idx;
         }
 
         public class PlayerManager : IReadOnlyList<Player>

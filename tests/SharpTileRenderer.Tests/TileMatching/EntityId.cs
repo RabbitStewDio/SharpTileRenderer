@@ -16,7 +16,7 @@ namespace SharpTileRenderer.Tests.TileMatching
             return Id == other.Id;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is EntityId other && Equals(other);
         }

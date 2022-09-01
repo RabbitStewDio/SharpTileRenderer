@@ -48,7 +48,7 @@ namespace SharpTileRenderer.Drawing.Monogame
         {
             if (TileSet.TryGetValue(out var ts))
             {
-                return CreateRendererForData(dataSet, l => ts, Optional.Empty<string>(), out c);
+                return CreateRendererForData(dataSet, _ => ts, Optional.Empty<string>(), out c);
             }
 
             c = null;

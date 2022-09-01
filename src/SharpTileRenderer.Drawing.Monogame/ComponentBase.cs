@@ -33,7 +33,7 @@ namespace SharpTileRenderer.Drawing.Monogame
         public void Dispose()
         {
             this.Dispose(true);
-            GC.SuppressFinalize((object) this);
+            GC.SuppressFinalize(this);
         }
 
 

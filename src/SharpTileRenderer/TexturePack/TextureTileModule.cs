@@ -1,9 +1,7 @@
 ﻿using SharpTileRenderer.TexturePack.Operations;
 using SharpTileRenderer.TexturePack.Tiles;
 using SharpTileRenderer.TileMatching;
-using SharpTileRenderer.TileMatching.DataSets;
 using SharpTileRenderer.Util;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SharpTileRenderer.TexturePack
 {

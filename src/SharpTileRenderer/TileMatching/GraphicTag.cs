@@ -30,11 +30,8 @@ namespace SharpTileRenderer.TileMatching
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                var hashCode = (Id != null ? Id.GetHashCode() : 0);
-                return hashCode;
-            }
+            var hashCode = (Id != null ? Id.GetHashCode() : 0);
+            return hashCode;
         }
 
         public static bool operator ==(GraphicTag left, GraphicTag right)

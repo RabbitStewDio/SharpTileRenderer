@@ -2,6 +2,7 @@
 using SharpTileRenderer.TexturePack;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SharpTileRenderer.Yaml.TexturePack.Model
 {
@@ -34,6 +35,7 @@ namespace SharpTileRenderer.Yaml.TexturePack.Model
         public TileShape TileShape { get; set; }
 
         [UsedImplicitly]
+        [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract")]
         public List<string> Includes
         {
             get
@@ -43,7 +45,6 @@ namespace SharpTileRenderer.Yaml.TexturePack.Model
             set
             {
                 includes.Clear();
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 if (value != null)
                 {
                     includes.Clear();
@@ -53,6 +54,7 @@ namespace SharpTileRenderer.Yaml.TexturePack.Model
         }
 
         [UsedImplicitly]
+        [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract")]
         public List<TextureFileModel> TextureFiles
         {
             get
@@ -62,7 +64,7 @@ namespace SharpTileRenderer.Yaml.TexturePack.Model
             set
             {
                 textureFiles.Clear();
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                
                 if (value != null)
                 {
                     textureFiles.Clear();

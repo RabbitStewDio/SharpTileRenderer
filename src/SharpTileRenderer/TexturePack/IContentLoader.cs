@@ -64,7 +64,7 @@ namespace SharpTileRenderer.TexturePack
 
         public static ContentUri Make(string schema, string path)
         {
-            return new ContentUri(schema, path, null, null, null, -1);
+            return new ContentUri(schema, path);
         }
 
         public ContentUri Combine(ContentUri path)
@@ -159,7 +159,7 @@ namespace SharpTileRenderer.TexturePack
 
         public static ContentUri MakeRelative(string path)
         {
-            return new ContentUri(null, path, null, null, null, -1);
+            return new ContentUri(null, path);
         }
 
         public static ContentUri Parse(string text)

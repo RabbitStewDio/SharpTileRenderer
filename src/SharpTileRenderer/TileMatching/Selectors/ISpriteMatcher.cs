@@ -18,7 +18,7 @@ namespace SharpTileRenderer.TileMatching.Selectors
         ///  Reads the input map at position (x,y) and produces a matching render tile based
         ///  on the map data found and the context of that map entry.
         /// </summary>
-        /// <param name="c">query result coordinate</param>
+        /// <param name="q">query input</param>
         /// <param name="z">query context</param>
         /// <param name="resultCollector">This callback receives all matched tiles.</param>
         /// <returns></returns>

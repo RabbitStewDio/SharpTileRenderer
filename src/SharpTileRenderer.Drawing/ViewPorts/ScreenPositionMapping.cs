@@ -10,7 +10,7 @@ namespace SharpTileRenderer.Drawing.ViewPorts
 {
     public class ScreenPositionMapping: IScreenPositionMapper
     {
-        readonly ILogger logger = SLog.ForContext<ScreenPositionMapping>();
+        static readonly ILogger logger = SLog.ForContext<ScreenPositionMapping>();
 
         readonly ScreenPositionMapper mapper;
         IMapNavigator<GridDirection>? navigator;
@@ -134,11 +134,11 @@ namespace SharpTileRenderer.Drawing.ViewPorts
             
             var mapNavigator = v.Navigation[MapNavigationType.Screen].AsVirtualNavigator();
             var normalizedNavigator = v.Navigation[MapNavigationType.Screen];
-            Console.WriteLine($"== Using navigator {normalizedNavigator.MetaData}");
+            logger.Debug("== Using navigator {Navigator}", normalizedNavigator.MetaData);
             
             for (int stepY = 0; stepY < tileBounds.Height * 2; stepY += 1)
             {
-                Console.WriteLine($"== Processing Screen={screenPos} Map={origin}");
+                logger.Debug("== Processing Screen={ScreenPos} Map={Origin}", screenPos, origin);
                 var lineOrigin = origin;
                 var lineOriginScreen = screenPos;
                 for (int stepX = 0; stepX < tileBounds.Width; stepX += 1)
@@ -147,11 +147,11 @@ namespace SharpTileRenderer.Drawing.ViewPorts
                     {
                         mapper.AddPhysical(mc, lineOriginScreen);
                         mapper.AddVirtual(mc, lineOriginScreen);
-                        Console.WriteLine($"   Physical Screen={lineOriginScreen} Map={mc}");
+                        logger.Debug("   Physical Screen={LineOriginScreen} Map={MapCoordinate}", lineOriginScreen, mc);
                     }
                     
                     mapper.AddVirtual(lineOrigin, lineOriginScreen);
-                    Console.WriteLine($"   Virtual Screen={lineOriginScreen} Map={lineOrigin}");
+                    logger.Debug("   Virtual Screen={LineOriginScreen} Map={LineOrigin}", lineOriginScreen, lineOrigin);
 
                     if (!mapNavigator.NavigateTo(GridDirection.East, lineOrigin, out lineOrigin))
                     {

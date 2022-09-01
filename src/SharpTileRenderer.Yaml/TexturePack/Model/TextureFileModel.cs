@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SharpTileRenderer.Yaml.TexturePack.Model
 {
@@ -25,6 +26,7 @@ namespace SharpTileRenderer.Yaml.TexturePack.Model
 
         [Required]
         [UsedImplicitly]
+        [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract")]
         public List<TileGridModel> Grids
         {
             get
@@ -34,7 +36,7 @@ namespace SharpTileRenderer.Yaml.TexturePack.Model
             set
             {
                 grids.Clear();
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                
                 if (value != null)
                 {
                     grids.Clear();

@@ -1,5 +1,4 @@
-﻿using SharpTileRenderer.TileMatching.Selectors;
-using System;
+﻿using System;
 
 namespace SharpTileRenderer.TileMatching
 {

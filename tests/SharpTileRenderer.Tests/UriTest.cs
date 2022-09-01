@@ -21,7 +21,7 @@ namespace SharpTileRenderer.Tests
                 new UriBuilder(x);
                 Assert.Fail();
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                 
             }

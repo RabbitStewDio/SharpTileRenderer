@@ -78,7 +78,7 @@ namespace SharpTileRenderer.Navigation
         /// <summary>
         /// Calculates the area of the rectangle.
         /// </summary>
-        [IgnoreDataMemberAttribute]
+        [IgnoreDataMember]
         public int Area
         {
             get => Width * Height;
@@ -88,7 +88,7 @@ namespace SharpTileRenderer.Navigation
         /// The center coordinate of the rectangle, rounded up if the exact center is between two
         /// positions. The center of a rectangle with width/height 1 is its <see cref="Position"/>.
         /// </summary>
-        [IgnoreDataMemberAttribute]
+        [IgnoreDataMember]
         public MapCoordinate Center
         {
             get => new MapCoordinate(X + (Width / 2), Y + (Height / 2));
@@ -97,7 +97,7 @@ namespace SharpTileRenderer.Navigation
         /// <summary>
         /// Whether or not this rectangle is empty (has width and height of 0).
         /// </summary>
-        [IgnoreDataMemberAttribute]
+        [IgnoreDataMember]
         public bool IsEmpty
         {
             get => (Width == 0 && Height == 0);
@@ -106,7 +106,7 @@ namespace SharpTileRenderer.Navigation
         /// <summary>
         /// The maximum X and Y coordinates that are included in the rectangle.
         /// </summary>
-        [IgnoreDataMemberAttribute]
+        [IgnoreDataMember]
         public MapCoordinate MaxExtent
         {
             get => new MapCoordinate(MaxExtentX, MaxExtentY);
@@ -115,7 +115,7 @@ namespace SharpTileRenderer.Navigation
         /// <summary>
         /// The maximum X-coordinate that is included in the rectangle.
         /// </summary>
-        [IgnoreDataMemberAttribute]
+        [IgnoreDataMember]
         public int MaxExtentX
         {
             get => X + Width - 1;
@@ -124,7 +124,7 @@ namespace SharpTileRenderer.Navigation
         /// <summary>
         /// The maximum Y-coordinate that is included in the rectangle.
         /// </summary>
-        [IgnoreDataMemberAttribute]
+        [IgnoreDataMember]
         public int MaxExtentY
         {
             get => Y + Height - 1;
@@ -135,7 +135,7 @@ namespace SharpTileRenderer.Navigation
         /// Identical to <see cref="Position"/> because we define the rectangle's position by its
         /// minimum extent.
         /// </summary>
-        [IgnoreDataMemberAttribute]
+        [IgnoreDataMember]
         public MapCoordinate MinExtent
         {
             get => new MapCoordinate(X, Y);
@@ -146,7 +146,7 @@ namespace SharpTileRenderer.Navigation
         /// it). Identical to the <see cref="X"/> value because we define the rectangle's position
         /// by its minimum extent.
         /// </summary>
-        [IgnoreDataMemberAttribute]
+        [IgnoreDataMember]
         public int MinExtentX
         {
             get => X;
@@ -157,7 +157,7 @@ namespace SharpTileRenderer.Navigation
         /// it). Identical to the <see cref="Y"/> value because we define the rectangle's position
         /// by its minimum extent.
         /// </summary>
-        [IgnoreDataMemberAttribute]
+        [IgnoreDataMember]
         public int MinExtentY
         {
             get => Y;
@@ -167,7 +167,7 @@ namespace SharpTileRenderer.Navigation
         /// Calculates the perimeter length of the rectangle.  This is equal to the mathematical
         /// perimeter, NOT the number of grid squares around the perimiter.
         /// </summary>
-        [IgnoreDataMemberAttribute]
+        [IgnoreDataMember]
         public int Perimeter
         {
             get => (2 * Width) + (2 * Height);
@@ -176,7 +176,7 @@ namespace SharpTileRenderer.Navigation
         /// <summary>
         /// Coord representing the position (min x- and y-values) of the rectangle.
         /// </summary>
-        [IgnoreDataMemberAttribute]
+        [IgnoreDataMember]
         public MapCoordinate Position
         {
             get => new MapCoordinate(X, Y);
@@ -185,7 +185,7 @@ namespace SharpTileRenderer.Navigation
         /// <summary>
         /// Returns a coordinate (Width, Height), which represents the size of the rectangle.
         /// </summary>
-        [IgnoreDataMemberAttribute]
+        [IgnoreDataMember]
         public MapCoordinate Size
         {
             get => new MapCoordinate(Width, Height);

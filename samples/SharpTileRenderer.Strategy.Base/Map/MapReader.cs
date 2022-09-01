@@ -14,7 +14,6 @@ namespace SharpTileRenderer.Strategy.Base.Map
         readonly Dictionary<char, ITerrainResource> resourcesByCharId;
         readonly Dictionary<char, IRoadType> roadsByCharId;
         readonly Dictionary<char, TerrainImprovement> improvementByCharId;
-        readonly IRoadType river;
 
         public MapReader(StrategyGameRules rules, TerrainMap map)
         {
@@ -28,7 +27,6 @@ namespace SharpTileRenderer.Strategy.Base.Map
             this.resourcesByCharId = rules.TerrainResourceTypes.Contents.Select(e => e.value).ToDict(r => r.AsciiId);
             this.roadsByCharId = rules.RoadTypes.Contents.Select(e => e.value).Where(r => !r.River).ToDict(r => r.AsciiId);
             this.improvementByCharId = rules.TerrainImprovementTypes.Contents.Select(e => e.value).ToDict(r => r.AsciiId);
-            this.river = rules.Roads.River;
         }
 
         public TerrainMap Map { get; }
