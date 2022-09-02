@@ -4,9 +4,6 @@ using System;
 
 namespace SharpTileRenderer.Drawing.ViewPorts.ScreenMapConverters
 {
-    /// <summary>
-    ///  todo: Probably totally messes up with rotation.
-    /// </summary>
     class IsoStaggeredScreenToMapConverter : IScreenToMapConverter
     {
         readonly GridScreenToMapConverter gridMapper;
@@ -75,10 +72,10 @@ namespace SharpTileRenderer.Drawing.ViewPorts.ScreenMapConverters
             var yNegative = (dy < 0);
             return (xpos: xNegative, ypos: yNegative) switch
             {
-                (false, false) => GridDirection.NorthEast,
-                (true, false) => GridDirection.NorthWest,
-                (false, true) => GridDirection.SouthEast,
-                (true, true) => GridDirection.SouthWest,
+                (true, true) => GridDirection.NorthEast,
+                (false, true) => GridDirection.NorthWest,
+                (true, false) => GridDirection.SouthEast,
+                (false, false) => GridDirection.SouthWest,
             };
         }
     }

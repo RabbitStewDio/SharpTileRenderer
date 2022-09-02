@@ -69,7 +69,7 @@ namespace SharpTileRenderer.Navigation
 
         public override string ToString()
         {
-            return $"{nameof(WrapXIndicator)}: {WrapXIndicator}, {nameof(WrapYIndicator)}: {WrapYIndicator}, {nameof(LimitedX)}: {LimitedX}, {nameof(LimitedY)}: {LimitedY}";
+            return $"NavigationInfo({nameof(WrapXIndicator)}: {WrapXIndicator}, {nameof(WrapYIndicator)}: {WrapYIndicator}, {nameof(LimitedX)}: {LimitedX}, {nameof(LimitedY)}: {LimitedY})";
         }
     }
 }
