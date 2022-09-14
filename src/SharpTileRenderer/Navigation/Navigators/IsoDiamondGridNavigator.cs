@@ -19,28 +19,28 @@ namespace SharpTileRenderer.Navigation.Navigators
                 case GridDirection.None:
                     result = origin;
                     break;
-                case GridDirection.North:
+                case GridDirection.NorthWest:
                     result = new MapCoordinate(origin.X - steps, origin.Y - steps);
                     break;
-                case GridDirection.NorthEast:
+                case GridDirection.North:
                     result = new MapCoordinate(origin.X, origin.Y - steps);
                     break;
-                case GridDirection.East:
+                case GridDirection.NorthEast:
                     result = new MapCoordinate(origin.X + steps, origin.Y - steps);
                     break;
-                case GridDirection.SouthEast:
+                case GridDirection.East:
                     result = new MapCoordinate(origin.X + steps, origin.Y);
                     break;
-                case GridDirection.South:
+                case GridDirection.SouthEast:
                     result = new MapCoordinate(origin.X + steps, origin.Y + steps);
                     break;
-                case GridDirection.SouthWest:
+                case GridDirection.South:
                     result = new MapCoordinate(origin.X, origin.Y + steps);
                     break;
-                case GridDirection.West:
+                case GridDirection.SouthWest:
                     result = new MapCoordinate(origin.X - steps, origin.Y + steps);
                     break;
-                case GridDirection.NorthWest:
+                case GridDirection.West:
                     result = new MapCoordinate(origin.X - steps, origin.Y);
                     break;
                 default:

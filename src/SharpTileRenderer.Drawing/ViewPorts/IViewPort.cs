@@ -33,7 +33,8 @@ namespace SharpTileRenderer.Drawing.ViewPorts
         
         /// <summary>
         ///    The map coordinate that correlates to the center of the screen bounds. Note that this map
-        ///    coordinate might not be valid on the map.
+        ///    coordinate might not be valid on the map. This coordinate is a map coordinate, so the x/y axes
+        ///    might not align with the screen's x/y axes.
         /// </summary>
         VirtualMapCoordinate Focus { get; }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using SharpTileRenderer.Drawing;
 using SharpTileRenderer.Drawing.Monogame;
 using SharpTileRenderer.Drawing.ViewPorts;
@@ -83,7 +84,7 @@ namespace SharpTileRenderer.Strategy.MonoGame
 
             renderComponent.ViewPort = new ViewPort(navConfig, texturePack.TileShape, texturePack.TileSize);
             renderComponent.SetLayers(layers);
-            renderComponent.ViewPort.Focus = new VirtualMapCoordinate(0, 2);
+            renderComponent.ViewPort.Focus = new VirtualMapCoordinate(9, 7);
         }
 
         protected override void Update(GameTime gameTime)
@@ -196,16 +197,20 @@ namespace SharpTileRenderer.Strategy.MonoGame
         {
             GraphicTag RiverToGraphicTag(TerrainData f)
             {
-                if ((f.RoadsAndRiver & RoadTypeId.River) == RoadTypeId.River) return GraphicTag.From("river");
+                if ((f.RoadsAndRiver & RoadTypeId.River) == RoadTypeId.River)
+                {
+                    return GraphicTag.From("road.river");
+                }
+                
                 if (game.GameData.Rules.TerrainTypes.TryGetValue(f.TerrainIdx, out var terrain))
                 {
                     if (terrain.Class == TerrainClass.Water)
                     {
-                        return GraphicTag.From("ocean");
+                        return GraphicTag.From("road.ocean");
                     }
                 }
 
-                return GraphicTag.From("land");
+                return GraphicTag.Empty;
             }
 
             return new DefaultMapTileDataSet<TerrainData, Unit>(game.GameData.Terrain, RiverToGraphicTag,
@@ -251,8 +256,8 @@ namespace SharpTileRenderer.Strategy.MonoGame
         {
             static GraphicTag RoadToGraphicTag(TerrainData f)
             {
-                if ((f.RoadsAndRiver & RoadTypeId.Railroad) == RoadTypeId.Railroad) return GraphicTag.From("roads.railroad");
-                if ((f.RoadsAndRiver & RoadTypeId.Road) == RoadTypeId.Road) return GraphicTag.From("roads.road");
+                if ((f.RoadsAndRiver & RoadTypeId.Railroad) == RoadTypeId.Railroad) return GraphicTag.From("road.rail");
+                if ((f.RoadsAndRiver & RoadTypeId.Road) == RoadTypeId.Road) return GraphicTag.From("road.road");
                 return GraphicTag.Empty;
             }
 

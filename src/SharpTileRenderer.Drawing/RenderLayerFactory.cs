@@ -14,8 +14,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SharpTileRenderer.Drawing
 {
-    
-    public class RenderLayerFactoryPart<TClassification>: IFeatureInitializer<TClassification>
+    public class RenderLayerFactoryPart<TClassification> : IFeatureInitializer<TClassification>
         where TClassification : struct, IEntityClassification<TClassification>
     {
         public RenderLayerFactoryPart(NavigatorMetaData md, EntityClassificationRegistry<TClassification> registry)
@@ -28,7 +27,7 @@ namespace SharpTileRenderer.Drawing
         }
 
         readonly List<IFeatureModule> features;
-        
+
         public NavigatorMetaData MapNavigator { get; }
 
         public EntityClassificationRegistry<TClassification> Registry { get; }
@@ -43,7 +42,7 @@ namespace SharpTileRenderer.Drawing
             f.Initialize(this);
             return this;
         }
-        
+
         public RenderLayerFactoryPart<TClassification> WithDefaultMatchers()
         {
             this.MatcherFactory.WithDefaultMatchers();
@@ -98,7 +97,8 @@ namespace SharpTileRenderer.Drawing
             dataContexts = new List<IRenderLayerProducer<TClassification>>();
         }
 
-        RenderLayerProducerData(EntityClassificationRegistry<TClassification> registry,
+        RenderLayerProducerData(NavigatorMetaData md,
+                                EntityClassificationRegistry<TClassification> registry,
                                 GraphicTagMetaDataRegistry<TClassification> tagMetaData,
                                 MatcherFactory<TClassification> matcherFactory,
                                 List<IRenderLayerProducer<TClassification>> dataContexts,
@@ -106,6 +106,7 @@ namespace SharpTileRenderer.Drawing
         {
             this.dataContexts = dataContexts ?? throw new ArgumentNullException(nameof(dataContexts));
             this.tileRendererFeatures = tileRendererFeatures ?? throw new ArgumentNullException(nameof(tileRendererFeatures));
+            MapNavigator = md;
             Registry = registry ?? throw new ArgumentNullException(nameof(registry));
             TagMetaData = tagMetaData ?? throw new ArgumentNullException(nameof(tagMetaData));
             MatcherFactory = matcherFactory ?? throw new ArgumentNullException(nameof(matcherFactory));
@@ -124,8 +125,8 @@ namespace SharpTileRenderer.Drawing
 
             f = default;
             return false;
-        } 
-        
+        }
+
         public RenderLayerProducerData<TClassification> WithDataSets<TEntity>(ITileDataSetProducer<TEntity> dataSets)
         {
             var dataContext = new List<IRenderLayerProducer<TClassification>>(this.dataContexts);
@@ -139,7 +140,8 @@ namespace SharpTileRenderer.Drawing
                     }
                 }
             }
-            return new RenderLayerProducerData<TClassification>(Registry, TagMetaData, MatcherFactory, dataContext, tileRendererFeatures);
+
+            return new RenderLayerProducerData<TClassification>(MapNavigator, Registry, TagMetaData, MatcherFactory, dataContext, tileRendererFeatures);
         }
 
         public RenderLayerProducerData<TClassification> WithAvailableDataSets<TEntity>(ITileDataSetProducer<TEntity> dataSets,
@@ -147,7 +149,7 @@ namespace SharpTileRenderer.Drawing
         {
             var dataContext = new List<IRenderLayerProducer<TClassification>>(this.dataContexts);
             dataContext.Add(layerProducer);
-            return new RenderLayerProducerData<TClassification>(Registry, TagMetaData, MatcherFactory, dataContext, tileRendererFeatures);
+            return new RenderLayerProducerData<TClassification>(MapNavigator, Registry, TagMetaData, MatcherFactory, dataContext, tileRendererFeatures);
         }
 
         public List<ILayer> ProduceLayers(TileMatcherModel renderConfig)
@@ -157,12 +159,17 @@ namespace SharpTileRenderer.Drawing
                 if (string.IsNullOrEmpty(tagDef.Id)) continue;
                 TagMetaData.Register(tagDef);
             }
-            
+
+            return ProduceLayers(renderConfig, renderConfig.RenderLayers);
+        }
+
+        List<ILayer> ProduceLayers(TileMatcherModel renderConfig, IReadOnlyList<RenderLayerModel> layers)
+        {
             var result = new List<ILayer>();
             foreach (var renderLayer in renderConfig.RenderLayers)
             {
                 if (!renderLayer.Enabled) continue;
-                
+
                 var layer = ProduceLayer(renderConfig, renderLayer);
                 if (layer.TryGetValue(out var l))
                 {
@@ -173,17 +180,15 @@ namespace SharpTileRenderer.Drawing
             return result;
         }
 
+
         Optional<ILayer> ProduceLayer(TileMatcherModel renderConfig, RenderLayerModel renderLayer)
         {
-            var renderLayerEntitySource = renderLayer.EntitySource ?? throw new ArgumentException();
-            var qid = renderLayerEntitySource.EntityQueryId ?? throw new ArgumentException();
-
             // First attempt to build feature-flag specific layers 
             if (renderLayer.FeatureFlags.Count > 0)
             {
                 foreach (var ds in dataContexts)
                 {
-                    if (!ds.ContainsDataSet(qid))
+                    if (!ds.HandlesLayer(renderLayer))
                     {
                         continue;
                     }
@@ -199,14 +204,14 @@ namespace SharpTileRenderer.Drawing
                         return Optional.OfNullable(l);
                     }
                 }
-                
+
                 return Optional.Empty<ILayer>();
             }
 
             // .. and only if there are no feature-flag layers defined, build a generic layer 
             foreach (var ds in dataContexts)
             {
-                if (!ds.ContainsDataSet(qid))
+                if (!ds.HandlesLayer(renderLayer))
                 {
                     continue;
                 }
@@ -224,48 +229,6 @@ namespace SharpTileRenderer.Drawing
         }
     }
 
-    public abstract class RenderLayerProducerBase<TEntity, TClassification> : IRenderLayerProducer<TClassification>
-        where TClassification : struct, IEntityClassification<TClassification>
-    {
-        readonly ITileDataSetProducer<TEntity> dataSets;
-
-        protected RenderLayerProducerBase(ITileDataSetProducer<TEntity> dataSets, Optional<string> featureFlag)
-        {
-            this.dataSets = dataSets;
-            this.FeatureFlag = featureFlag;
-        }
-
-        public bool ContainsDataSet(string id)
-        {
-            return this.dataSets.ContainsDataSet(id);
-        }
-
-        public Optional<string> FeatureFlag { get; }
-
-        protected abstract ITileRenderer<TEntity> CreateRenderer(RenderLayerModel layer, IRenderLayerProducerData<TClassification> parameters);
-
-        public ILayer Create(TileMatcherModel tileMatcherModel,
-                             RenderLayerModel layer,
-                             IRenderLayerProducerData<TClassification> parameters)
-        {
-            if (layer.Match == null) throw new ArgumentNullException();
-            var ctx = DefaultMatchFactoryContext.From(dataSets, parameters.MapNavigator.BuildNavigator(), parameters.Registry, parameters.TagMetaData);
-
-            var l = RenderLayerFactory.CreateLayer<TEntity>(layer, tileMatcherModel.DataSets);
-            if (layer.Match.IsQuantifiedSelector)
-            {
-                return l.Counted()
-                        .UsingGraphicTags()
-                        .WithMatcher(layer.Match, parameters.MatcherFactory, ctx)
-                        .Build(dataSets, CreateRenderer(layer, parameters));
-            }
-
-            return l.UsingGraphicTags()
-                    .WithMatcher(layer.Match, parameters.MatcherFactory, ctx)
-                    .Build(dataSets, CreateRenderer(layer, parameters));
-        }
-    }
-
     public interface IRenderLayerProducerData<TClassification>
         where TClassification : struct, IEntityClassification<TClassification>
     {
@@ -278,7 +241,7 @@ namespace SharpTileRenderer.Drawing
     public interface IRenderLayerProducer<TClassification>
         where TClassification : struct, IEntityClassification<TClassification>
     {
-        bool ContainsDataSet(string id);
+        bool HandlesLayer(RenderLayerModel layer);
         Optional<string> FeatureFlag { get; }
         ILayer Create(TileMatcherModel tileMatcherModel, RenderLayerModel layer, IRenderLayerProducerData<TClassification> parameters);
     }
@@ -308,13 +271,53 @@ namespace SharpTileRenderer.Drawing
             return new RenderFactoryData(layerId, RenderingSortOrder.TopDownLeftRight, LayerQueryType.Grid, Array.Empty<IDataSetModel>());
         }
 
+        public static CombinedLayer<TEntityKey> CreateCombinedLayer<TEntityKey>(RenderLayerModel layerModel,
+                                                                                       ITileRenderer<TEntityKey> renderer,
+                                                                                       params ILayer<TEntityKey>[]? layers)
+        {
+            if (layerModel == null)
+            {
+                throw new ArgumentNullException(nameof(layerModel));
+            }
+
+            if (renderer == null)
+            {
+                throw new ArgumentNullException(nameof(renderer));
+            }
+
+            if (layerModel.Id == null) throw new ArgumentException();
+            if (layerModel.SubLayers.Count == 0)
+            {
+                throw new ArgumentException();
+            }
+
+            layers ??= Array.Empty<ILayer<TEntityKey>>();
+            return new CombinedLayer<TEntityKey>(layerModel.Id,
+                                                 layerModel.SortingOrder, renderer, layers);
+        }
+
         public static RenderFactoryData<TEntityKey> CreateLayer<TEntityKey>(RenderLayerModel layerModel, IReadOnlyList<IDataSetModel> models)
         {
-            if (layerModel.EntitySource == null) throw new ArgumentException();
+            if (layerModel == null)
+            {
+                throw new ArgumentNullException(nameof(layerModel));
+            }
+
+            if (models == null)
+            {
+                throw new ArgumentNullException(nameof(models));
+            }
+
             if (layerModel.Id == null) throw new ArgumentException();
+            if (layerModel.SubLayers.Count > 0)
+            {
+                throw new ArgumentException();
+            }
+
+            if (layerModel.EntitySource == null) throw new ArgumentException();
             if (layerModel.EntitySource.EntityQueryId == null) throw new ArgumentException();
             return new RenderFactoryData(layerModel.Id,
-                                         layerModel.EntitySource.SortingOrder,
+                                         layerModel.SortingOrder,
                                          layerModel.EntitySource.LayerQueryType,
                                          models)
                 .WithEntityData<TEntityKey>(layerModel.EntitySource.EntityQueryId);
@@ -331,7 +334,7 @@ namespace SharpTileRenderer.Drawing
             if (layerModel.EntitySource.EntityQueryId == null) throw new ArgumentException();
             if (layerModel.Match == null) throw new ArgumentException();
             var d = new RenderFactoryData(layerModel.Id,
-                                          layerModel.EntitySource.SortingOrder,
+                                          layerModel.SortingOrder,
                                           layerModel.EntitySource.LayerQueryType,
                                           models)
                 .WithEntityData<TEntityKey>(layerModel.EntitySource.EntityQueryId);

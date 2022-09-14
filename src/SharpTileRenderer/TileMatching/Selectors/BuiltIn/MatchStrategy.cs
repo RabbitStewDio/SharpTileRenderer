@@ -14,6 +14,7 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
     public readonly struct MatchStrategy
     {
         static readonly ILogger logger = SLog.ForContext<MatchStrategy>();
+        static readonly HashSet<(MapCoordinate, GraphicTag)> logTracker = new HashSet<(MapCoordinate, GraphicTag)>();
         
         readonly ObjectPool<List<SparseTagQueryResult<GraphicTag, Unit>>> queryBufferPool;
         readonly ITileDataSet<GraphicTag, Unit> dataSet;
@@ -46,9 +47,16 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
                     }
                 }
 
-                if (logger.IsEnabled(LogEventLevel.Debug))
+                if (logger.IsEnabled(LogEventLevel.Debug) && queryBuffer.Count > 0)
                 {
-                    logger.Debug("Failed match at {Coordinate} for {QueryResult}", c, queryBuffer);
+                    lock (logTracker)
+                    {
+                        var key = (c, queryBuffer[0].TagData);
+                        if (!logTracker.Add(key))
+                        {
+                            logger.Debug("Failed match at {Coordinate} for {QueryResult}", c, queryBuffer);
+                        }
+                    }
                 }
                 return defaultValue.TryGetValue(out match);
             }

@@ -124,7 +124,7 @@ namespace SharpTileRenderer.Strategy.Base.Map
       |
       |         x
       |xxx    xxx
-      |  xxx xx
+      |  xxxxxx
       |       xxxxxx
       |
       |

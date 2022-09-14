@@ -54,7 +54,7 @@ namespace SharpTileRenderer.Xml.TileMatching
         public string Write(TileMatcherModel model)
         {
             var docNode = new XElement(XmlTileMatcherModelTags.TileSpecTag);
-            docNode.Add(new XAttribute(XNamespace.Xmlns + "ts", XmlTileSelectorModelTags.NS));
+            docNode.Add(new XAttribute(XNamespace.Xmlns + "ts", XmlTileSelectorModelTags.Ns));
             docNode.AddStringElement(XmlTileMatcherModelTags.AuthorTag, model.Author);
             docNode.AddStringElement(XmlTileMatcherModelTags.VersionTag, model.Version);
             docNode.AddStringElement(XmlTileMatcherModelTags.DocumentationTag, model.Documentation);
@@ -78,14 +78,55 @@ namespace SharpTileRenderer.Xml.TileMatching
                 }
 
                 renderLayerElement.AddStringElement(XmlTileMatcherModelTags.EnabledTag, l.Enabled ? "true" : "false");
-                renderLayerElement.Add(CreateEntitySourceElement(l.EntitySource));
-                renderLayerElement.Add(WriteSelector(l.Match));
+                renderLayerElement.AddStringElement(XmlTileMatcherModelTags.EntitySortOrderTag, $"{l.SortingOrder}");
                 renderLayerElement.Add(l.FeatureFlags.AddStringList(XmlTileMatcherModelTags.FeatureFlagsTag, XmlTileMatcherModelTags.FeatureFlagTag));
                 renderLayerElement.Add(l.Properties.AddPropertiesList());
+                if (l.EntitySource != null)
+                {
+                    renderLayerElement.Add(CreateEntitySourceElement(l.EntitySource));
+                }
+
+                if (l.Match != null)
+                {
+                    renderLayerElement.Add(WriteSelector(l.Match));
+                }
+                
+                AddSubLayersElement(l.SubLayers, renderLayerElement);
+                
                 renderLayersElement.Add(renderLayerElement);
             }
 
             return renderLayersElement;
+        }
+
+        void AddSubLayersElement(IReadOnlyList<RenderLayerModel> layers, XElement e)
+        {
+            if (layers.Count == 0) return;
+            foreach (var l in layers)
+            {
+                var renderLayerElement = new XElement(XmlTileMatcherModelTags.SubLayerTag);
+                renderLayerElement.AddStringElement(XmlTileMatcherModelTags.IdTag, l.Id);
+                if (l.RenderOrder != null)
+                {
+                    renderLayerElement.AddStringElement(XmlTileMatcherModelTags.RenderOrder, $"{l.RenderOrder}");
+                }
+
+                renderLayerElement.AddStringElement(XmlTileMatcherModelTags.EnabledTag, l.Enabled ? "true" : "false");
+                renderLayerElement.Add(l.FeatureFlags.AddStringList(XmlTileMatcherModelTags.FeatureFlagsTag, XmlTileMatcherModelTags.FeatureFlagTag));
+                renderLayerElement.Add(l.Properties.AddPropertiesList());
+                if (l.EntitySource != null)
+                {
+                    renderLayerElement.Add(CreateEntitySourceElement(l.EntitySource));
+                }
+
+                if (l.Match != null)
+                {
+                    renderLayerElement.Add(WriteSelector(l.Match));
+                }
+                
+                
+                e.Add(renderLayerElement);
+            }
         }
 
         XElement? CreateEntitySourceElement(EntitySourceModel? entitySource)
@@ -94,7 +135,6 @@ namespace SharpTileRenderer.Xml.TileMatching
             
             var retval = new XElement(XmlTileMatcherModelTags.EntitySourceTag);
             retval.AddStringElement(XmlTileMatcherModelTags.EntityQueryIdTag, entitySource.EntityQueryId);
-            retval.AddStringElement(XmlTileMatcherModelTags.EntitySortOrderTag, $"{entitySource.SortingOrder}");
             retval.AddStringElement(XmlTileMatcherModelTags.EntityQueryTypeTag, $"{entitySource.LayerQueryType}");
             return retval;
         }

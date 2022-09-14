@@ -35,6 +35,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpTileRenderer.Xml", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpTileRenderer.Yaml", "src\SharpTileRenderer.Yaml\SharpTileRenderer.Yaml.csproj", "{B3F2FBF1-985F-40C7-94E1-DA835C9E808F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpTileRenderer.RPG.Base", "samples\SharpTileRenderer.RPG.Base\SharpTileRenderer.RPG.Base.csproj", "{A46FDE08-8900-4B67-A735-E83605B39682}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpTileRenderer.RPG.MonoGame", "samples\SharpTileRenderer.RPG.MonoGame\SharpTileRenderer.RPG.MonoGame.csproj", "{08400B14-04F4-4B66-822F-ED6343B1A8D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -240,5 +244,29 @@ Global
 		{B3F2FBF1-985F-40C7-94E1-DA835C9E808F}.Release|x64.Build.0 = Release|Any CPU
 		{B3F2FBF1-985F-40C7-94E1-DA835C9E808F}.Release|x86.ActiveCfg = Release|Any CPU
 		{B3F2FBF1-985F-40C7-94E1-DA835C9E808F}.Release|x86.Build.0 = Release|Any CPU
+		{A46FDE08-8900-4B67-A735-E83605B39682}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A46FDE08-8900-4B67-A735-E83605B39682}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A46FDE08-8900-4B67-A735-E83605B39682}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A46FDE08-8900-4B67-A735-E83605B39682}.Debug|x64.Build.0 = Debug|Any CPU
+		{A46FDE08-8900-4B67-A735-E83605B39682}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A46FDE08-8900-4B67-A735-E83605B39682}.Debug|x86.Build.0 = Debug|Any CPU
+		{A46FDE08-8900-4B67-A735-E83605B39682}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A46FDE08-8900-4B67-A735-E83605B39682}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A46FDE08-8900-4B67-A735-E83605B39682}.Release|x64.ActiveCfg = Release|Any CPU
+		{A46FDE08-8900-4B67-A735-E83605B39682}.Release|x64.Build.0 = Release|Any CPU
+		{A46FDE08-8900-4B67-A735-E83605B39682}.Release|x86.ActiveCfg = Release|Any CPU
+		{A46FDE08-8900-4B67-A735-E83605B39682}.Release|x86.Build.0 = Release|Any CPU
+		{08400B14-04F4-4B66-822F-ED6343B1A8D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08400B14-04F4-4B66-822F-ED6343B1A8D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08400B14-04F4-4B66-822F-ED6343B1A8D3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{08400B14-04F4-4B66-822F-ED6343B1A8D3}.Debug|x64.Build.0 = Debug|Any CPU
+		{08400B14-04F4-4B66-822F-ED6343B1A8D3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{08400B14-04F4-4B66-822F-ED6343B1A8D3}.Debug|x86.Build.0 = Debug|Any CPU
+		{08400B14-04F4-4B66-822F-ED6343B1A8D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08400B14-04F4-4B66-822F-ED6343B1A8D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08400B14-04F4-4B66-822F-ED6343B1A8D3}.Release|x64.ActiveCfg = Release|Any CPU
+		{08400B14-04F4-4B66-822F-ED6343B1A8D3}.Release|x64.Build.0 = Release|Any CPU
+		{08400B14-04F4-4B66-822F-ED6343B1A8D3}.Release|x86.ActiveCfg = Release|Any CPU
+		{08400B14-04F4-4B66-822F-ED6343B1A8D3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

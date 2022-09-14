@@ -128,21 +128,21 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
             return new[]
             {
                 new SelectorDefinition(SpritePosition.Up,
-                                       NeighbourIndex.West.AsInt(),
-                                       NeighbourIndex.NorthWest.AsInt(),
-                                       NeighbourIndex.North.AsInt()),
-                new SelectorDefinition(SpritePosition.Right,
                                        NeighbourIndex.North.AsInt(),
                                        NeighbourIndex.NorthEast.AsInt(),
                                        NeighbourIndex.East.AsInt()),
-                new SelectorDefinition(SpritePosition.Down,
+                new SelectorDefinition(SpritePosition.Right,
                                        NeighbourIndex.East.AsInt(),
                                        NeighbourIndex.SouthEast.AsInt(),
                                        NeighbourIndex.South.AsInt()),
-                new SelectorDefinition(SpritePosition.Left,
+                new SelectorDefinition(SpritePosition.Down,
                                        NeighbourIndex.South.AsInt(),
                                        NeighbourIndex.SouthWest.AsInt(),
-                                       NeighbourIndex.West.AsInt())
+                                       NeighbourIndex.West.AsInt()),
+                new SelectorDefinition(SpritePosition.Left,
+                                       NeighbourIndex.West.AsInt(),
+                                       NeighbourIndex.NorthWest.AsInt(),
+                                       NeighbourIndex.North.AsInt())
             };
         }
 

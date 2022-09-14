@@ -52,6 +52,12 @@ namespace SharpTileRenderer.Navigation
             return new MapCoordinate((int)Math.Floor(X + 0.5f), (int)Math.Floor(Y + 0.5f));
         }
 
+        public ContinuousMapCoordinate InTilePosition()
+        {
+            var n = Normalize();
+            return new ContinuousMapCoordinate(X - n.X, Y - n.Y);
+        }
+
         public static implicit operator ContinuousMapCoordinate(MapCoordinate m)
         {
             return new ContinuousMapCoordinate(m.X, m.Y);

@@ -12,13 +12,15 @@ using System.Collections.Generic;
 namespace SharpTileRenderer.Tests.TileMatching
 {
     [TestFixture]
-    public class CardinalSelectorTest: SelectorTestBase<CardinalSelectorModel>
+    public class CardinalSelectorTest : SelectorTestBase<CardinalSelectorModel>
     {
-        protected override string XmlResult => @"<tile-set xmlns:ts=""https://docs.rabbit-stew-dio.com/xml-schema/tileselector/v1/"" xmlns=""https://docs.rabbit-stew-dio.com/xml-schema/tilematcher/v1/"">
+        protected override string XmlResult =>
+            @"<tile-set xmlns:ts=""https://docs.rabbit-stew-dio.com/xml-schema/tileselector/v1/"" xmlns=""https://docs.rabbit-stew-dio.com/xml-schema/tilematcher/v1/"">
   <layers>
     <layer>
       <id>test-layer</id>
       <enabled>true</enabled>
+      <sort-order>TopDownLeftRight</sort-order>
       <ts:cardinal>
         <ts:prefix>t.prefix.</ts:prefix>
         <ts:context-data-set>context-data</ts:context-data-set>
@@ -37,6 +39,7 @@ namespace SharpTileRenderer.Tests.TileMatching
 renderLayers:
   - id: test-layer
     enabled: true
+    sortingOrder: TopDownLeftRight
     match:
       kind: cardinal
       prefix: t.prefix.
@@ -147,7 +150,5 @@ renderLayers:
             spriteMatcher.Match(input, 0, resultCollector).Should().BeTrue();
             resultCollector.Should().BeEquivalentTo((SpriteTag.Create(sm.Prefix, input.TagData.ToString(), "_n0e0s0w0"), SpritePosition.Whole, input.Position));
         }
-
-
     }
 }

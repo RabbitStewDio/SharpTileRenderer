@@ -43,24 +43,12 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
             var tileTagEntrySelections = cardinality.TryLookup(defaultMatch).Cast<ITileTagEntrySelection>();
             this.matcher = new MatchStrategy(dataSet, graphicTagToClassMapping, tileTagEntrySelections);
 
-            if (this.navigator.MetaData.GridType == GridType.Grid)
+            this.navigationStrategy = navigationDirection switch
             {
-                this.navigationStrategy = navigationDirection switch
-                {
-                    CellGroupNavigationDirection.Down => NavigateForDownwardRenderDirectionGrid,
-                    CellGroupNavigationDirection.Up => NavigateForUpwardRenderDirectionGrid,
-                    _ => throw new ArgumentException()
-                };
-            }
-            else
-            {
-                this.navigationStrategy = navigationDirection switch
-                {
-                    CellGroupNavigationDirection.Down => NavigateForDownwardRenderDirectionIso,
-                    CellGroupNavigationDirection.Up => NavigateForUpwardRenderDirectionIso,
-                    _ => throw new ArgumentException()
-                };
-            }
+                CellGroupNavigationDirection.Down => NavigateForDownwardRenderDirectionIso,
+                CellGroupNavigationDirection.Up => NavigateForUpwardRenderDirectionIso,
+                _ => throw new ArgumentException()
+            };
         }
 
         SpriteTag[] PrepareResultMappings(TileTagEntrySelectionFactory<TClass> owner)
@@ -97,20 +85,21 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
             //
             //       /\
             //      /A \
-            //     /\ 2/\
-            //    / D\/ B \
-            //    \1 /\ 3 /
-            //     \/ C\/
-            //      \**/
-            //       \/
+            //     /\  /\
+            //    / D\/ B\     +---+---+
+            //    \  /\  /     | D | A |
+            //     \/ C\/      +---+---+
+            //      \**/       | C | B |
+            //       \/        +---+---+
             //
             // tile_cell_A_B_C_D
+            // tile_cell_east_south_west_north
             // self is at C
 
             coordC = origin;
-            navigator.NavigateTo(GridDirection.North, coordC, out coordA);
-            navigator.NavigateTo(GridDirection.NorthEast, coordC, out coordB);
-            navigator.NavigateTo(GridDirection.NorthWest, coordC, out coordD);
+            navigator.NavigateTo(GridDirection.NorthEast, coordC, out coordA);
+            navigator.NavigateTo(GridDirection.East, coordC, out coordB);
+            navigator.NavigateTo(GridDirection.North, coordC, out coordD);
         }
 
         void NavigateForDownwardRenderDirectionIso(in MapCoordinate origin,
@@ -122,58 +111,22 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
             //
             //       /\
             //      /A \
-            //     /\**/\       N 
-            //    / D\/ B\     / \ 
-            //    \  /\  /    / | \   
-            //     \/ C\/       |   
-            //      \  / 
-            //       \/
+            //     /\ */\
+            //    / D\/ B\     +---+---+
+            //    \  /\  /     | D | A |
+            //     \/ C\/      +---+---+
+            //      \  /       | C | B |
+            //       \/        +---+---+
+            //
             //
             // tile_cell_A_B_C_D
             // self is A
             coordA = origin;
-            navigator.NavigateTo(GridDirection.South, origin, out coordC);
-            navigator.NavigateTo(GridDirection.SouthWest, origin, out coordD);
-            navigator.NavigateTo(GridDirection.SouthEast, origin, out coordB);
-        }
-
-
-        void NavigateForUpwardRenderDirectionGrid(in MapCoordinate origin,
-                                                  out MapCoordinate coordA,
-                                                  out MapCoordinate coordB,
-                                                  out MapCoordinate coordC,
-                                                  out MapCoordinate coordD)
-        {
-            //
-            //    A B
-            //    D C
-            //
-            // tile_cell_A_B_C_D
-            // self is at C
-
-            coordC = origin;
-            navigator.NavigateTo(GridDirection.NorthWest, origin, out coordA);
-            navigator.NavigateTo(GridDirection.North, origin, out coordB);
+            navigator.NavigateTo(GridDirection.SouthWest, origin, out coordC);
             navigator.NavigateTo(GridDirection.West, origin, out coordD);
+            navigator.NavigateTo(GridDirection.South, origin, out coordB);
         }
 
-        void NavigateForDownwardRenderDirectionGrid(in MapCoordinate origin,
-                                                    out MapCoordinate coordA,
-                                                    out MapCoordinate coordB,
-                                                    out MapCoordinate coordC,
-                                                    out MapCoordinate coordD)
-        {
-            //
-            //    A B
-            //    D C
-            //
-            // tile_cell_A_B_C_D
-            // self is A
-            coordA = origin;
-            navigator.NavigateTo(GridDirection.East, origin, out coordB);
-            navigator.NavigateTo(GridDirection.SouthEast, origin, out coordC);
-            navigator.NavigateTo(GridDirection.South, origin, out coordD);
-        }
 
 
         public bool Match(in SpriteMatcherInput<GraphicTag> q, int z, List<(SpriteTag tag, SpritePosition spriteOffset, ContinuousMapCoordinate pos)> resultCollector)
@@ -183,7 +136,7 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
                                out MapCoordinate coordB,
                                out MapCoordinate coordC,
                                out MapCoordinate coordD);
-
+            
             if (matcher.TryMatch(coordA, z, out var matchA) &&
                 matcher.TryMatch(coordB, z, out var matchB) &&
                 matcher.TryMatch(coordC, z, out var matchC) &&

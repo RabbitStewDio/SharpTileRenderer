@@ -56,7 +56,6 @@
                 <ts:choice-selection>
                     <ts:basic>
                         <ts:prefix>t.l0.</ts:prefix>
-                        <ts:suffix>1</ts:suffix>
                     </ts:basic>
                     <ts:choice-matches>
                         <ts:graphic-tag>arctic</ts:graphic-tag>
@@ -74,9 +73,6 @@
         </layer>
         <layer>
             <layer-id>terrain-land-blend-layer</layer-id>
-            <entity-source>
-                <entity-query-id>terrain</entity-query-id>
-            </entity-source>
             <feature-flags>
                 <feature-flag>blend-layer</feature-flag>
             </feature-flags>
@@ -86,6 +82,9 @@
                     <value>t.dither_tile</value>
                 </property>
             </properties>
+            <entity-source>
+                <entity-query-id>terrain</entity-query-id>
+            </entity-source>
             <ts:blend>
                 <ts:prefix>blend.</ts:prefix>
                 <ts:context-data-set>terrain</ts:context-data-set>
@@ -180,28 +179,26 @@
                 <entity-query-id>rivers</entity-query-id>
             </entity-source>
             <ts:list>
-                <ts:selectors>
-                    <ts:cardinal>
-                        <ts:prefix>t.river</ts:prefix>
-                        <ts:context-data-set>rivers</ts:context-data-set>
-                        <ts:match-self>
-                            <ts:class>river</ts:class>
-                        </ts:match-self>
-                        <ts:match-with>
-                            <ts:class>water</ts:class>
-                        </ts:match-with>
-                    </ts:cardinal>
-                    <ts:river-outlet>
-                        <ts:prefix>t.river_outlet</ts:prefix>
-                        <ts:context-data-set>rivers</ts:context-data-set>
-                        <ts:match-self>
-                            <ts:class>river</ts:class>
-                        </ts:match-self>
-                        <ts:match-with>
-                            <ts:class>water</ts:class>
-                        </ts:match-with>
-                    </ts:river-outlet>
-                </ts:selectors>
+                <ts:cardinal>
+                    <ts:context-data-set>rivers</ts:context-data-set>
+                    <ts:match-self>
+                        <ts:class>river</ts:class>
+                    </ts:match-self>
+                    <ts:match-with>
+                        <ts:class>river</ts:class>
+                        <ts:class>water</ts:class>
+                    </ts:match-with>
+                </ts:cardinal>
+                <ts:river-outlet>
+                    <ts:prefix>t.river_outlet</ts:prefix>
+                    <ts:context-data-set>rivers</ts:context-data-set>
+                    <ts:match-self>
+                        <ts:class>river</ts:class>
+                    </ts:match-self>
+                    <ts:match-with>
+                        <ts:class>water</ts:class>
+                    </ts:match-with>
+                </ts:river-outlet>
             </ts:list>
         </layer>
         <layer>
@@ -209,16 +206,30 @@
             <entity-source>
                 <entity-query-id>roads</entity-query-id>
             </entity-source>
-            <ts:neighbour-overlay>
-                <ts:prefix>road.road</ts:prefix>
-                <ts:context-data-set>roads</ts:context-data-set>
-                <ts:match-self>
-                    <ts:class>road</ts:class>
-                </ts:match-self>
-                <ts:match-with>
-                    <ts:class>road</ts:class>
-                </ts:match-with>
-            </ts:neighbour-overlay>
+            <ts:list>
+                <ts:neighbour-overlay>
+                    <ts:context-data-set>roads</ts:context-data-set>
+                    <ts:force-graphic>road.road</ts:force-graphic>
+                    <ts:match-self>
+                        <ts:class>road</ts:class>
+                        <ts:class>railroad</ts:class>
+                    </ts:match-self>
+                    <ts:match-with>
+                        <ts:class>road</ts:class>
+                        <ts:class>railroad</ts:class>
+                    </ts:match-with>
+                </ts:neighbour-overlay>
+                <ts:neighbour-overlay>
+                    <ts:context-data-set>roads</ts:context-data-set>
+                    <ts:force-graphic>road.rail</ts:force-graphic>
+                    <ts:match-self>
+                        <ts:class>railroad</ts:class>
+                    </ts:match-self>
+                    <ts:match-with>
+                        <ts:class>railroad</ts:class>
+                    </ts:match-with>
+                </ts:neighbour-overlay>
+            </ts:list>
         </layer>
         <layer>
             <layer-id>resources</layer-id>
@@ -237,28 +248,24 @@
             <ts:quantity-choice>
                 <ts:quantity-selection>
                     <ts:basic>
-                        <ts:prefix>city.</ts:prefix>
                         <ts:suffix>_1</ts:suffix>
                     </ts:basic>
                     <ts:quantity>1</ts:quantity>
                 </ts:quantity-selection>
                 <ts:quantity-selection>
                     <ts:basic>
-                        <ts:prefix>city.</ts:prefix>
                         <ts:suffix>_2</ts:suffix>
                     </ts:basic>
                     <ts:quantity>2</ts:quantity>
                 </ts:quantity-selection>
                 <ts:quantity-selection>
                     <ts:basic>
-                        <ts:prefix>city.</ts:prefix>
                         <ts:suffix>_3</ts:suffix>
                     </ts:basic>
                     <ts:quantity>3</ts:quantity>
                 </ts:quantity-selection>
                 <ts:quantity-selection>
                     <ts:basic>
-                        <ts:prefix>city.</ts:prefix>
                         <ts:suffix>_4</ts:suffix>
                     </ts:basic>
                     <ts:quantity>4</ts:quantity>
@@ -373,6 +380,34 @@
             </classes>
         </graphic-tag>
 
+        <!-- River layer tags -->
+        <graphic-tag>
+            <id>road.river</id>
+            <classes>
+                <class>river</class>
+            </classes>
+        </graphic-tag>
+        <graphic-tag>
+            <id>road.ocean</id>
+            <classes>
+                <class>water</class>
+            </classes>
+        </graphic-tag>
+        
+        <!-- River layer tags -->
+        <graphic-tag>
+            <id>road.road</id>
+            <classes>
+                <class>road</class>
+            </classes>
+        </graphic-tag>
+        <graphic-tag>
+            <id>road.rail</id>
+            <classes>
+                <class>railroad</class>
+            </classes>
+        </graphic-tag>
+        
         <!-- Fog layer classification. -->
         <graphic-tag>
             <id>fog.fog</id>

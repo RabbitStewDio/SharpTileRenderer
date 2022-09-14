@@ -94,7 +94,7 @@
 
         public TerrainData WithImprovement(TerrainImprovementId valueId)
         {
-            var modImprovement = improvement & RoadMask;
+            var modImprovement = improvement & RoadAndRiverMask;
             var impId = valueId.ImprovementId << 3;
             modImprovement |= impId;
             return new TerrainData(TerrainIdx, ownerData, City, Resources, (ushort) modImprovement);

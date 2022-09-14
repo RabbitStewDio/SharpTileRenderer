@@ -47,7 +47,7 @@ namespace SharpTileRenderer.Drawing.ViewPorts
         public ScreenSpaceNavigator(GridType t, IntDimension tileSize)
         {
             forwardMapper = ScreenToMapConverter.Create(t);
-            reverseMapper = new ScreenPositionMapping(new ScreenPositionMapper(tileSize));
+            reverseMapper = new ScreenPositionMapping(t, tileSize);
         }
 
         public void Refresh(IViewPort p)
@@ -74,6 +74,7 @@ namespace SharpTileRenderer.Drawing.ViewPorts
         public List<ScreenPosition> MapInverse(IViewPort vp, ContinuousMapCoordinate pos, List<ScreenPosition>? result = null)
         {
             result ??= new List<ScreenPosition>(); 
+            result.Clear();
             reverseMapper.TryMapPhysical(pos, result);
             return result;
         }

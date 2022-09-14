@@ -1,8 +1,8 @@
 ﻿namespace SharpTileRenderer.Navigation
 {
     /// <summary>
-    ///  A map navigator knows how to progress from one tile to the next given an abstract
-    ///  direction. 
+    ///  A map navigator knows how to progress from one tile to the next given an abstract direction.
+    ///  A non-rotated navigator aligns so that moving north is equal to moving towards negative y. 
     /// </summary>
     public interface IMapNavigator<in TDirection>
         where TDirection : struct

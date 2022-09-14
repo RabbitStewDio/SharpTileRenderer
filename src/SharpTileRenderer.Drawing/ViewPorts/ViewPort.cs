@@ -31,7 +31,7 @@ namespace SharpTileRenderer.Drawing.ViewPorts
             this.screenNavigator = navigatorConfig.WithRotation(RotationForGridType(GridType)).BuildNavigator();
         }
 
-        static int RotationForGridType(GridType gridType) => gridType == GridType.Grid ? 0 : -1;
+        static int RotationForGridType(GridType gridType) => gridType == GridType.Grid ? 0 : 1;
         
         public IMapNavigation Navigation => this;
 

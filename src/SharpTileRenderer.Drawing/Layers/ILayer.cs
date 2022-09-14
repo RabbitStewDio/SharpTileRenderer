@@ -15,4 +15,9 @@ namespace SharpTileRenderer.Drawing.Layers
         void RenderLayer(IViewPort v);
         ValueTask RenderLayerAsync(IViewPort v, CancellationToken tk);
     }
+
+    public interface ILayer<TEntity>: ILayer
+    {
+        IReadOnlyList<ScreenRenderInstruction<TEntity>> RenderBuffer { get; }
+    }
 }

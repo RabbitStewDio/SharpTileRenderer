@@ -10,8 +10,6 @@ namespace SharpTileRenderer.TileMatching.Model.EntitySources
         [DataMember]
         string? entityQueryId;
         [DataMember]
-        RenderingSortOrder sortingOrder;
-        [DataMember]
         LayerQueryType layerQueryType;
 
         [IgnoreDataMember]
@@ -25,21 +23,6 @@ namespace SharpTileRenderer.TileMatching.Model.EntitySources
             {
                 if (value == entityQueryId) return;
                 entityQueryId = value;
-                OnPropertyChanged();
-            }
-        }
-
-        [IgnoreDataMember]
-        public RenderingSortOrder SortingOrder
-        {
-            get
-            {
-                return sortingOrder;
-            }
-            set
-            {
-                if (value == sortingOrder) return;
-                sortingOrder = value;
                 OnPropertyChanged();
             }
         }
@@ -71,7 +54,7 @@ namespace SharpTileRenderer.TileMatching.Model.EntitySources
                 return true;
             }
 
-            return entityQueryId == other.entityQueryId && sortingOrder == other.sortingOrder && layerQueryType == other.layerQueryType;
+            return entityQueryId == other.entityQueryId && layerQueryType == other.layerQueryType;
         }
 
         public override bool Equals(object? obj)
@@ -100,7 +83,6 @@ namespace SharpTileRenderer.TileMatching.Model.EntitySources
             unchecked
             {
                 var hashCode = (entityQueryId != null ? entityQueryId.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (int)sortingOrder;
                 hashCode = (hashCode * 397) ^ (int)layerQueryType;
                 return hashCode;
             }

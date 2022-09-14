@@ -49,7 +49,7 @@ namespace SharpTileRenderer.TileMatching.DataSets
             {
                 return result.Value;
             }
-            throw new ArgumentException($"No tag data set with id '${id}' defined");
+            throw new ArgumentException($"No tag data set with id '{id}' defined");
         }
 
         public IQuantifiedTagTileDataSet<GraphicTag, TEntity, int> CreateCountedGraphicDataSet(string id)
@@ -58,7 +58,7 @@ namespace SharpTileRenderer.TileMatching.DataSets
             {
                 return result.Value;
             }
-            throw new ArgumentException($"No quantified tag data set with id '${id}' defined");
+            throw new ArgumentException($"No quantified tag data set with id '{id}' defined");
         }
     }
 }

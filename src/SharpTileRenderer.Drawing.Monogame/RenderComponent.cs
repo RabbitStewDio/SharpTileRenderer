@@ -87,6 +87,16 @@ namespace SharpTileRenderer.Drawing.Monogame
             }
         }
 
+        public void SetLayers(params ILayer[] layers)
+        {
+            this.layers.Clear();
+            for (var index = 0; index < layers.Length; index++)
+            {
+                var l = layers[index];
+                this.layers.Add(l);
+            }
+        }
+
         public override void Draw(GameTime gameTime)
         {
             if (viewPort == null) return;

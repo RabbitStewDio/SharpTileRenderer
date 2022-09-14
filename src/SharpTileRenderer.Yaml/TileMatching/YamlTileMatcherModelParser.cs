@@ -4,6 +4,7 @@ using SharpTileRenderer.TileMatching.Model.DataSets;
 using SharpTileRenderer.TileMatching.Model.EntitySources;
 using SharpTileRenderer.TileMatching.Model.Meta;
 using SharpTileRenderer.TileMatching.Model.Selectors;
+using SharpTileRenderer.Util;
 using SharpYaml.Model;
 using SharpYaml.Serialization;
 using System;
@@ -156,43 +157,87 @@ namespace SharpTileRenderer.Yaml.TileMatching
                     continue;
                 }
 
-                var id = element.ParseProperty(namingConvention.Convert(nameof(RenderLayerModel.Id))) ?? throw new ArgumentException();
-                var enabled = "true".Equals(element.ParseProperty(namingConvention.Convert(nameof(RenderLayerModel.Enabled))) ?? "true");
-                var renderOrderText = element.ParseProperty(namingConvention.Convert(nameof(RenderLayerModel.RenderOrder)));
-                int? renderOrder;
-                if (!string.IsNullOrEmpty(renderOrderText))
-                {
-
-                    if (!int.TryParse(renderOrderText, out var ro))
-                    {
-                        throw new ArgumentException();
-                    }
-
-                    renderOrder = ro;
-                }
-                else
-                {
-                    renderOrder = null;
-                }
-                
-                var entitySourceNode = element[namingConvention.Convert(nameof(RenderLayerModel.EntitySource))] as YamlMapping;
-                var entitySource = entitySourceNode?.ToObject<EntitySourceModel>(SerializerSettings);
-                var matchNode = element[namingConvention.Convert(nameof(RenderLayerModel.Match))] as YamlMapping ?? throw new ArgumentException();
-
-                var renderLayerModel = new RenderLayerModel()
-                {
-                    Id = id,
-                    EntitySource = entitySource,
-                    Match = ParseSelector(matchNode),
-                    RenderOrder = renderOrder,
-                    Enabled = enabled
-                };
-                var classes = doc[namingConvention.Convert(nameof(RenderLayerModel.FeatureFlags))] as YamlSequence;
-                ParseStringList(classes, renderLayerModel.FeatureFlags);
+                var renderLayerModel = ParseLayer(element);
                 retval.RenderLayers.Add(renderLayerModel);
             }
         }
 
+        RenderLayerModel ParseLayer(YamlMapping element)
+        {
+            var id = element.ParseProperty(namingConvention.Convert(nameof(RenderLayerModel.Id))) ?? throw new ArgumentException();
+            var enabled = "true".Equals(element.ParseProperty(namingConvention.Convert(nameof(RenderLayerModel.Enabled))) ?? "true");
+            var renderOrderText = element.ParseProperty(namingConvention.Convert(nameof(RenderLayerModel.RenderOrder)));
+            int? renderOrder;
+            if (!string.IsNullOrEmpty(renderOrderText))
+            {
+                if (!int.TryParse(renderOrderText, out var ro))
+                {
+                    throw new ArgumentException();
+                }
+
+                renderOrder = ro;
+            }
+            else
+            {
+                renderOrder = null;
+            }
+
+            var entitySourceNode = element[namingConvention.Convert(nameof(RenderLayerModel.EntitySource))] as YamlMapping;
+            var entitySource = entitySourceNode?.ToObject<EntitySourceModel>(SerializerSettings);
+            var matchNode = element[namingConvention.Convert(nameof(RenderLayerModel.Match))] as YamlMapping ?? throw new ArgumentException();
+
+            var renderLayerModel = new RenderLayerModel()
+            {
+                Id = id,
+                EntitySource = entitySource,
+                RenderOrder = renderOrder,
+                Enabled = enabled
+            };
+
+            if (element[namingConvention.Convert(nameof(RenderLayerModel.Properties))] is YamlMapping propertiesNode)
+            {
+                var dict = propertiesNode.ToObject<Dictionary<string, string>>();
+                foreach (var v in dict)
+                {
+                    renderLayerModel.Properties[v.Key] = v.Value;
+                }
+            }
+
+            var classes = element[namingConvention.Convert(nameof(RenderLayerModel.FeatureFlags))] as YamlSequence;
+            ParseStringList(classes, renderLayerModel.FeatureFlags);
+            if (TryParseSelector(matchNode).TryGetValue(out var match))
+            {
+                renderLayerModel.Match = match;
+            }
+            else
+            {
+                var subLayers = element[namingConvention.Convert(nameof(RenderLayerModel.SubLayers))] as YamlSequence;
+                if (subLayers == null) throw new YamlParsingException($"Layer '{renderLayerModel.Id}' must contain either a valid matcher or a non-empty sub-layer list");
+                foreach (var subLayer in subLayers)
+                {
+                    if (subLayer is YamlMapping subLayerMapping)
+                    {
+                        renderLayerModel.SubLayers.Add(ParseLayer(subLayerMapping));
+                    } 
+                }
+            }
+            
+            return renderLayerModel;
+        }
+
+        public Optional<ISelectorModel> TryParseSelector(YamlMapping matchNodeYamlMapping)
+        {
+            var matchType = matchNodeYamlMapping.ParseProperty(namingConvention.Convert(nameof(ISelectorModel.Kind)));
+            if (matchType == null) return default;
+            if (selectorFactories.TryGetValue(matchType, out var factoryFunction))
+            {
+                var selector = factoryFunction(matchNodeYamlMapping, CreateContext());
+                return Optional.OfNullable(selector);
+            }
+
+            throw new ArgumentException($"Matcher type {matchType} does not exist");
+        }
+        
         public ISelectorModel ParseSelector(YamlMapping matchNodeYamlMapping)
         {
             var matchType = matchNodeYamlMapping.ParseProperty(namingConvention.Convert(nameof(ISelectorModel.Kind))) ?? throw new ArgumentException("Matcher node is missing match-type property");

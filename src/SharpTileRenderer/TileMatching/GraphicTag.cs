@@ -51,6 +51,6 @@ namespace SharpTileRenderer.TileMatching
 
         public SpriteTag AsSpriteTag() => SpriteTag.FromGraphicTag(this);
 
-        public static GraphicTag From(string s) => new GraphicTag(s);
+        public static GraphicTag From(string? s) => new GraphicTag(s);
     }
 }

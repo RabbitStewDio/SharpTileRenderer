@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharpTileRenderer.TexturePack;
+using System;
 
 namespace SharpTileRenderer.Drawing.ViewPorts
 {
@@ -42,6 +43,26 @@ namespace SharpTileRenderer.Drawing.ViewPorts
         public static bool operator !=(ScreenPosition left, ScreenPosition right)
         {
             return !left.Equals(right);
+        }
+
+        public static ScreenPosition operator +(ScreenPosition left, VirtualMapCoordinate right)
+        {
+            return new ScreenPosition((float)Math.Floor(left.X + right.X), (float)Math.Floor(left.Y + right.Y));
+        }
+
+        public static ScreenPosition operator -(ScreenPosition left, VirtualMapCoordinate right)
+        {
+            return new ScreenPosition((float)Math.Floor(left.X - right.X), (float)Math.Floor(left.Y - right.Y));
+        }
+
+        public static ScreenPosition operator -(ScreenPosition left, ScreenPosition right)
+        {
+            return new ScreenPosition(left.X - right.X, left.Y - right.Y);
+        }
+
+        public static ScreenPosition operator +(ScreenPosition left, ScreenPosition right)
+        {
+            return new ScreenPosition(left.X + right.X, left.Y + right.Y);
         }
 
         public override string ToString()

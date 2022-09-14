@@ -16,15 +16,23 @@ namespace SharpTileRenderer.Drawing.Queries
             Span<QueryPlan> tmpList = stackalloc QueryPlan[9];
             Span<bool> tmpActiveFlags = stackalloc bool[9];
 
+            var normalizedNavigator = v.Navigation[MapNavigationType.Screen];
+            var mapNavigator = normalizedNavigator.AsVirtualNavigator();
+
+            // represents the rendered tile area
             var activeBounds = v.PixelBounds + v.PixelOverdraw + new ScreenInsets(v.TileSize.Height, v.TileSize.Width);
-            var screenPos = new ScreenPosition(activeBounds.X, activeBounds.Y);
-            var origin = v.ScreenSpaceNavigator.TranslateViewToWorld(v, screenPos).VirtualCoordinate.Normalize();
+            // represents the focus point, the map position directly under the center of the active bounds area
+            var focusPointScreen = v.PixelBounds.Center;
+            var centerRaw = v.ScreenSpaceNavigator.TranslateViewToWorld(v, focusPointScreen).VirtualCoordinate;
+            var tilesToBoundsOriginPx = (focusPointScreen - activeBounds.TopLeft);
+            var tilesToBoundsOrigin = ((int)Math.Ceiling(tilesToBoundsOriginPx.X / v.TileSize.Width),
+                                       (int)Math.Ceiling(tilesToBoundsOriginPx.Y / v.TileSize.Height));
+
+            mapNavigator.NavigateTo(GridDirection.North, centerRaw.Normalize(), out var origin, tilesToBoundsOrigin.Item2);
+            mapNavigator.NavigateTo(GridDirection.West, origin, out origin, tilesToBoundsOrigin.Item1);
 
             var tileSize = v.TileSize;
             var tileBounds = activeBounds / tileSize;
-            
-            var mapNavigator = v.Navigation[MapNavigationType.Screen].AsVirtualNavigator();
-            var normalizedNavigator = v.Navigation[MapNavigationType.Screen];
             
             for (int stepY = 0; stepY < tileBounds.Height * 2; stepY += 1)
             {
@@ -79,6 +87,14 @@ namespace SharpTileRenderer.Drawing.Queries
                 activeFlags[pos] = true;
                 queryPlan[pos] = QueryPlan.FromSingle(c);
             }
+        }
+
+        IMapNavigator<GridDirection> Fetch(NavigatorMetaData md)
+        {
+            var normalizedMetaData = md.WithoutHorizontalOperation()
+                                       .WithoutVerticalOperation();
+            var navigator = normalizedMetaData.BuildNavigator();
+            return navigator;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

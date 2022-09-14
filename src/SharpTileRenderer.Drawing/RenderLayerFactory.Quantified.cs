@@ -79,14 +79,14 @@ namespace SharpTileRenderer.Drawing
                 this.entityQuery = entityQuery;
             }
 
-            public ILayer Build(ITileDataSetProducer<TEntity> p,
-                                ITileRenderer<TEntity> renderer)
+            public ILayer<(TEntity, int)> Build(ITileDataSetProducer<TEntity> p,
+                                                ITileRenderer<TEntity> renderer)
             {
                 return Build(p, new StripQuantityTileRenderer<TEntity, int>(renderer));
             }
 
-            public ILayer Build(ITileDataSetProducer<TEntity> p,
-                                ITileRenderer<(TEntity, int)> renderer)
+            public ILayer<(TEntity, int)> Build(ITileDataSetProducer<TEntity> p,
+                                                ITileRenderer<(TEntity, int)> renderer)
             {
                 if (!FindDataSourceDefinition(coreData.Models, entityQuery).TryGetValue(out var model))
                 {

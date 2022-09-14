@@ -1,4 +1,5 @@
 ﻿using SharpTileRenderer.Navigation;
+using SharpTileRenderer.TexturePack;
 using System;
 
 namespace SharpTileRenderer.Drawing.ViewPorts
@@ -76,6 +77,11 @@ namespace SharpTileRenderer.Drawing.ViewPorts
             return new VirtualMapCoordinate(left.X + right.X, left.Y + right.Y);
         }
         
+        public static VirtualMapCoordinate operator *(IntDimension left, VirtualMapCoordinate right)
+        {
+            return new VirtualMapCoordinate(left.Width * right.X, left.Height * right.Y);
+        }
+        
         public MapCoordinate Normalize()
         {
             return new MapCoordinate((int)Math.Floor(X + 0.5f), (int)Math.Floor(Y + 0.5f));
@@ -89,6 +95,12 @@ namespace SharpTileRenderer.Drawing.ViewPorts
         public MapCoordinate Floor()
         {
             return new MapCoordinate((int)Math.Floor(X), (int)Math.Floor(Y));
+        }
+
+        public VirtualMapCoordinate InTilePosition()
+        {
+            var n = Normalize();
+            return new VirtualMapCoordinate(X - n.X, Y - n.Y);
         }
 
         public override string ToString()

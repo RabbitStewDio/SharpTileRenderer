@@ -139,7 +139,7 @@ namespace SharpTileRenderer.Tests
             var layer2 = RenderLayerFactory.CreateLayer(layerOne.Id)
                                            .WithAvailableDataSets(dataSetModels)
                                            .WithQueryType(layerOne.EntitySource.LayerQueryType)
-                                           .WithRenderOrder(layerOne.EntitySource.SortingOrder)
+                                           .WithRenderOrder(layerOne.SortingOrder)
                                            .WithEntityData<TestEntityKey>(layerOne.EntitySource.EntityQueryId)
                                            .Counted()
                                            .UsingGraphicTags()
@@ -179,11 +179,11 @@ namespace SharpTileRenderer.Tests
                         .WithRenderLayer(new RenderLayerModel()
                             {
                                 Id = "SomeLayer",
+                                SortingOrder = RenderingSortOrder.TopDownLeftRight,
                                 EntitySource = new EntitySourceModel()
                                 {
                                     EntityQueryId = "SomeTagData",
                                     LayerQueryType = LayerQueryType.Grid,
-                                    SortingOrder = RenderingSortOrder.TopDownLeftRight
                                 },
                                 Match = null
                             }
@@ -191,11 +191,11 @@ namespace SharpTileRenderer.Tests
                         .WithRenderLayer(new RenderLayerModel()
                             {
                                 Id = "SomeCountedLayer",
+                                SortingOrder = RenderingSortOrder.TopDownLeftRight,
                                 EntitySource = new EntitySourceModel()
                                 {
                                     EntityQueryId = "SomeTagData",
                                     LayerQueryType = LayerQueryType.Grid,
-                                    SortingOrder = RenderingSortOrder.TopDownLeftRight
                                 },
                                 Match = null
                             }

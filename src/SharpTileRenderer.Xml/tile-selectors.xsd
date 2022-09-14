@@ -92,6 +92,7 @@
                     <xsd:all>
                         <xsd:element name="prefix" type="xsd:string" minOccurs="0"/>
                         <xsd:element name="context-data-set" type="xsd:string"/>
+                        <xsd:element name="force-graphic" type="xsd:string" minOccurs="0"/>
                         <xsd:element name="match-self" type="matchesElement"/>
                         <xsd:element name="match-with" type="matchesElement"/>
                     </xsd:all>
@@ -164,8 +165,8 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="tm:matcherElement">
-                    <xsd:sequence>
-                        <xsd:element name="selectors" type="ts:selectorElement" maxOccurs="unbounded"/>
+                    <xsd:sequence maxOccurs="unbounded">
+                        <xsd:element ref="tm:matcherAbstract"/>
                     </xsd:sequence>
                 </xsd:extension>
             </xsd:complexContent>
@@ -215,11 +216,5 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-
-    <xsd:complexType name="selectorElement">
-        <xsd:sequence maxOccurs="unbounded">
-            <xsd:element ref="tm:matcherAbstract"/>
-        </xsd:sequence>
-    </xsd:complexType>
 
 </xsd:schema>

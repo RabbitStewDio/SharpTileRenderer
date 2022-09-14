@@ -110,55 +110,55 @@
         <tag>road.road_isolated</tag>
       </tile>
       <tile x="1" y="12">
-        <tag>road.road_n</tag>
-      </tile>
-      <tile x="2" y="12">
-        <tag>road.road_ne</tag>
-      </tile>
-      <tile x="3" y="12">
         <tag>road.road_e</tag>
       </tile>
-      <tile x="4" y="12">
+      <tile x="2" y="12">
         <tag>road.road_se</tag>
       </tile>
-      <tile x="5" y="12">
+      <tile x="3" y="12">
         <tag>road.road_s</tag>
       </tile>
-      <tile x="6" y="12">
+      <tile x="4" y="12">
         <tag>road.road_sw</tag>
       </tile>
-      <tile x="7" y="12">
+      <tile x="5" y="12">
         <tag>road.road_w</tag>
       </tile>
-      <tile x="8" y="12">
+      <tile x="6" y="12">
         <tag>road.road_nw</tag>
+      </tile>
+      <tile x="7" y="12">
+        <tag>road.road_n</tag>
+      </tile>
+      <tile x="8" y="12">
+        <tag>road.road_ne</tag>
       </tile>
       <tile x="0" y="13">
         <tag>road.rail_isolated</tag>
       </tile>
       <tile x="1" y="13">
-        <tag>road.rail_n</tag>
-      </tile>
-      <tile x="2" y="13">
-        <tag>road.rail_ne</tag>
-      </tile>
-      <tile x="3" y="13">
         <tag>road.rail_e</tag>
       </tile>
-      <tile x="4" y="13">
+      <tile x="2" y="13">
         <tag>road.rail_se</tag>
       </tile>
-      <tile x="5" y="13">
+      <tile x="3" y="13">
         <tag>road.rail_s</tag>
       </tile>
-      <tile x="6" y="13">
+      <tile x="4" y="13">
         <tag>road.rail_sw</tag>
       </tile>
-      <tile x="7" y="13">
+      <tile x="5" y="13">
         <tag>road.rail_w</tag>
       </tile>
-      <tile x="8" y="13">
+      <tile x="6" y="13">
         <tag>road.rail_nw</tag>
+      </tile>
+      <tile x="7" y="13">
+        <tag>road.rail_n</tag>
+      </tile>
+      <tile x="8" y="13">
+        <tag>road.rail_ne</tag>
       </tile>
       <tile x="6" y="0">
         <tag>tx.oil_mine</tag>

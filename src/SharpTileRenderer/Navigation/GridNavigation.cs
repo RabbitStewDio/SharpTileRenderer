@@ -56,7 +56,7 @@ namespace SharpTileRenderer.Navigation
 
         public static IMapNavigator<GridDirection> BuildNavigator(this NavigatorMetaData md)
         {
-            var root = GridNavigation.CreateNavigator(md.GridType);
+            var root = CreateNavigator(md.GridType);
             if (md.HorizontalBorderOperation == md.VerticalBorderOperation)
             {
                 root = md.HorizontalBorderOperation switch

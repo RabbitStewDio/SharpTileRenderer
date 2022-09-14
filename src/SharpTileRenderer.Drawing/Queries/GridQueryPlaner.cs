@@ -23,8 +23,8 @@ namespace SharpTileRenderer.Drawing.Queries
             var tileSize = v.TileSize;
             var tileBounds = activeArea / tileSize;
             
-            var mapNavigator = v.Navigation[MapNavigationType.Screen].AsVirtualNavigator();
-            var normalizedNavigator = v.Navigation[MapNavigationType.Screen];
+            var mapNavigator = v.Navigation[MapNavigationType.Map].AsVirtualNavigator();
+            var normalizedNavigator = v.Navigation[MapNavigationType.Map];
 
             for (int stepY = 0; stepY < tileBounds.Height; stepY += 1)
             {

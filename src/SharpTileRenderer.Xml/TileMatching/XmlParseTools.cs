@@ -90,7 +90,7 @@ namespace SharpTileRenderer.Xml.TileMatching
 
             if (!Enum.TryParse(t, out T result))
             {
-                throw new XmlParseException("Attribute value is invalid.", lineInfo);
+                throw new XmlParseException($"Attribute value '{t}' for enum {typeof(T)} is invalid.", lineInfo);
             }
 
             return result;

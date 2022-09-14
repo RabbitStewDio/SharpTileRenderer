@@ -1,6 +1,7 @@
 ﻿using SharpTileRenderer.Drawing.Utils;
 using SharpTileRenderer.Navigation;
 using SharpTileRenderer.TexturePack;
+using System;
 using System.Collections.Generic;
 
 namespace SharpTileRenderer.Drawing.ViewPorts
@@ -24,10 +25,12 @@ namespace SharpTileRenderer.Drawing.ViewPorts
         readonly Dictionary<MapCoordinate, FreeListIndex> normalizedMapping;
         readonly Dictionary<MapCoordinate, ScreenPosition> virtualMapping;
         readonly SmartFreeList<ScreenPositionEntry> data;
+        readonly GridType gridType;
         readonly IntDimension tileSize;
         
-        public ScreenPositionMapper(IntDimension tileSize)
+        public ScreenPositionMapper(GridType gridType, IntDimension tileSize)
         {
+            this.gridType = gridType;
             this.tileSize = tileSize;
             normalizedMapping = new Dictionary<MapCoordinate, FreeListIndex>();
             virtualMapping = new Dictionary<MapCoordinate, ScreenPosition>();
@@ -55,26 +58,61 @@ namespace SharpTileRenderer.Drawing.ViewPorts
 
         public bool TryMapVirtual(VirtualMapCoordinate pos, out ScreenPosition sp)
         {
-            return virtualMapping.TryGetValue(pos.Normalize(), out sp);
+
+            if (!virtualMapping.TryGetValue(pos.Normalize(), out sp))
+            {
+                return false;
+            }
+            
+            var cell = pos.InTilePosition();
+            var m = gridType switch
+            {
+                GridType.Grid => new ContinuousMapCoordinate(cell.X, cell.Y),
+                GridType.IsoDiamond => ComputeIsoDiamond(cell.X, cell.Y),
+                GridType.IsoStaggered => ComputeIsoDiamond(cell.X, cell.Y),
+                _ => throw new ArgumentException()
+            };
+
+            sp = new ScreenPosition(sp.X + (m.X * tileSize.Width), 
+                                    sp.Y + (m.Y * tileSize.Height));
+            return true;
         }
 
+        internal static ContinuousMapCoordinate ComputeIsoDiamond(float x, float y)
+        {
+            var screenX = (y + x) / 2;
+            var screenY = (y - x) / 2;
+            return new ContinuousMapCoordinate(screenX, screenY);
+        }
+        
         public bool TryMapPhysical(ContinuousMapCoordinate pos, List<ScreenPosition> results)
         {
             results.Clear();
 
             var normalized = pos.Normalize();
-            var deltaX = (pos.X - normalized.X) * tileSize.Width;
-            var deltaY = (pos.Y - normalized.Y) * tileSize.Height;
+            var cell = pos.InTilePosition();
             if (!normalizedMapping.TryGetValue(normalized, out var idx))
             {
                 return false;
             }
 
+            var mapped = gridType switch
+            {
+                GridType.Grid => cell,
+                GridType.IsoDiamond => ComputeIsoDiamond(cell.X, cell.Y),
+                GridType.IsoStaggered => ComputeIsoDiamond(cell.X, cell.Y),
+                    _ => throw new ArgumentException()
+            };
+
+            var m = new ContinuousMapCoordinate(mapped.X * tileSize.Width, mapped.Y * tileSize.Height);
+            
             while (!idx.IsEmpty)
             {
                 var screenPositionEntry = data[idx];
                 var screenPos = screenPositionEntry.Position;
-                results.Add(new ScreenPosition(screenPos.X + deltaX, screenPos.Y + deltaY));
+              //  Console.WriteLine("Mapping " + normalized + " to " + screenPos);
+              //  Console.WriteLine("        " + cell + " to " + m);
+                results.Add(new ScreenPosition(screenPos.X + m.X, screenPos.Y + m.Y));
                 idx = screenPositionEntry.Next;
             }
 

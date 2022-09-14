@@ -94,12 +94,8 @@ namespace SharpTileRenderer.Drawing.Monogame
                 {
                     var textureBounds = texture.Bounds;
                     var anchor = tile.Anchor;
-                    var destPos = new Rectangle((int)(Math.Floor(renderPos.X - anchor.X)),
-                                                (int)(Math.Floor(renderPos.Y - anchor.Y)),
-                                                textureBounds.Width,
-                                                textureBounds.Height);
                     var tint = Color.White;
-                    sb.Draw(texture.Texture, destPos, textureBounds.ToXna(), tint);
+                    sb.Draw(texture.Texture, new Vector2(renderPos.X - anchor.X, renderPos.Y - anchor.Y), textureBounds.ToXna(), tint);
                 }
                 else if (!warnedItems.Contains(spriteTag))
                 {

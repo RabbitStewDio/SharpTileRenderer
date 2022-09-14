@@ -2,11 +2,14 @@
 {
     class IsoDiamondScreenToMapConverter : IScreenToMapConverter
     {
-        readonly GridScreenToMapConverter gridMapper;
-
-        public IsoDiamondScreenToMapConverter()
+        VirtualMapCoordinate GridMap(IViewPort vp, ScreenPosition p)
         {
-            gridMapper = new GridScreenToMapConverter();
+            var centre = vp.PixelBounds.Center;
+
+            var x = p.X - centre.X;
+            var y = p.Y - centre.Y;
+            var tileSize = vp.TileSize;
+            return new VirtualMapCoordinate((x / tileSize.Width), (y / tileSize.Height));
         }
 
         public VirtualMapCoordinate ScreenToMap(IViewPort vp, ScreenPosition p)
@@ -15,10 +18,10 @@
             // this roughly tells us the cell we are in.
             // Note: Grid coordinates are 1-unit based, 
             //       as opposed to the 4-unit based view coordinates 
-            var grid = gridMapper.ScreenToMap(vp, p);
+            var grid = GridMap(vp, p);
             var mouseGridX = (grid.Y + grid.X);
             var mouseGridY = (grid.Y - grid.X);
-            return new VirtualMapCoordinate(mouseGridX, mouseGridY);
+            return new VirtualMapCoordinate(mouseGridX, -mouseGridY) + vp.Focus;
         }
     }
 }

@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<tile-set xmlns="https://docs.rabbit-stew-dio.com/xml-schema/texturepack/v1/"
+          width="54" height="27" type="Isometric">
+    <collection id="dg_iso32">
+        <grid name="Default" x="0" y="0" cell-width="54" cell-height="49" anchor-x="27" anchor-y="34">
+            <tile x="0" y="0">
+                <metadata selector-hint="gras-floor"/>
+                <tag>terrain.grass</tag>
+            </tile>
+            <tile x="1" y="1">
+                <metadata selector-hint="stone-floor"/>
+                <tag>terrain.stone</tag>
+            </tile>
+            <tile x="0" y="5">
+                <metadata selector-hint="wall, single wall and catch-all for dangling entries."/>
+                <tag>structure.wall_n0e0s0w0</tag>
+                <tag>structure.wall_n1e0s0w0</tag>
+                <tag>structure.wall_n0e1s0w0</tag>
+                <tag>structure.wall_n0e0s1w0</tag>
+                <tag>structure.wall_n0e0s0w1</tag>
+            </tile>
+            <tile x="1" y="5">
+                <tag>structure.wall_n0e1s0w1</tag>
+            </tile>
+            <tile x="2" y="5">
+                <tag>structure.wall_n1e0s1w0</tag>
+            </tile>
+            <tile x="3" y="5">
+                <tag>structure.wall_n1e0s0w1</tag>
+            </tile>
+            <tile x="4" y="5">
+                <tag>structure.wall_n1e1s0w0</tag>
+            </tile>
+            <tile x="5" y="5">
+                <tag>structure.wall_n0e1s1w0</tag>
+            </tile>
+            <tile x="6" y="5">
+                <tag>structure.wall_n0e0s1w1</tag>
+            </tile>
+            <tile x="7" y="5">
+                <tag>structure.wall_n1e1s0w1</tag>
+            </tile>
+            <tile x="8" y="5">
+                <tag>structure.wall_n1e1s1w0</tag>
+            </tile>
+            <tile x="9" y="5">
+                <tag>structure.wall_n0e1s1w1</tag>
+            </tile>
+            <tile x="10" y="5">
+                <tag>structure.wall_n1e0s1w1</tag>
+            </tile>
+            <tile x="11" y="5">
+                <tag>structure.wall_n1e1s1w1</tag>
+            </tile>
+            <tile x="11" y="6">
+                <tag>structure.door-closed_n0e1s0w1</tag>
+            </tile>
+            <tile x="12" y="6">
+                <tag>structure.door-closed_n1e0s1w0</tag>
+                <tag>structure.door-closed</tag>
+            </tile>
+            <tile x="13" y="6">
+                <tag>structure.door-open_n0e1s0w1</tag>
+            </tile>
+            <tile x="0" y="7">
+                <tag>structure.door-open_n1e0s1w0</tag>
+                <tag>structure.door-open</tag>
+            </tile>
+            <tile x="1" y="7">
+                <tag>structure.stairs_n0e1s0w1</tag>
+            </tile>
+            <tile x="2" y="7">
+                <tag>structure.stairs_n1e0s1w0</tag>
+                <tag>structure.stairs</tag>
+            </tile>
+        </grid>
+    </collection>
+    <collection id="L2_Chest15_x">
+        <grid name="Default" x="0" y="0" cell-width="54" cell-height="54" anchor-x="27" anchor-y="40">
+            <tile x="0" y="0">
+                <tag>item.chest-closed</tag>
+            </tile>
+        </grid>
+    </collection>
+    <collection id="L2_Chest16_x">
+        <grid name="Default" x="0" y="0" cell-width="54" cell-height="54" anchor-x="27" anchor-y="40">
+            <tile x="0" y="0">
+                <tag>item.chest-open</tag>
+            </tile>
+        </grid>
+    </collection>
+    <collection id="L3_WallDeco03_x">
+        <grid name="Default" x="0" y="0" cell-width="54" cell-height="54" anchor-x="27" anchor-y="40">
+            <tile x="0" y="0">
+                <tag>decoration.shelf_n0e1s0w1</tag>
+            </tile>
+        </grid>
+    </collection>
+    <collection id="L3_WallDeco04_x">
+        <grid name="Default" x="0" y="0" cell-width="54" cell-height="54" anchor-x="27" anchor-y="40">
+            <tile x="0" y="0">
+                <tag>decoration.shelf_n1e0s1w0</tag>
+            </tile>
+        </grid>
+    </collection>
+    <collection id="L3_Window2_x">
+        <grid name="Default" x="0" y="0" cell-width="54" cell-height="54" anchor-x="27" anchor-y="40">
+            <tile x="0" y="0">
+                <tag>decoration.window_n0e1s0w1</tag>
+            </tile>
+        </grid>
+    </collection>
+    <collection id="L3_Window1_x">
+        <grid name="Default" x="0" y="0" cell-width="54" cell-height="54" anchor-x="27" anchor-y="40">
+            <tile x="0" y="0">
+                <tag>decoration.window_n1e0s1w0</tag>
+            </tile>
+        </grid>
+    </collection>
+    <collection id="dg_misc32">
+        <grid name="Default" x="0" y="0" cell-width="32" cell-height="32" anchor-x="16" anchor-y="24">
+            <tile x="2" y="1">
+                <tag>item.gold</tag>
+            </tile>
+        </grid>
+    </collection>
+    <collection id="dg_food32">
+        <grid name="Default" x="0" y="0" cell-width="32" cell-height="32" anchor-x="16" anchor-y="24">
+            <tile x="4" y="0">
+                <tag>item.food</tag>
+            </tile>
+        </grid>
+    </collection>
+    <collection id="dg_armor32">
+        <grid name="Default" x="0" y="0" cell-width="32" cell-height="32" anchor-x="16" anchor-y="24">
+            <tile x="0" y="5">
+                <tag>item.plate-armor</tag>
+            </tile>
+            <tile x="5" y="5">
+                <tag>item.chainmail</tag>
+            </tile>
+        </grid>
+    </collection>
+    <collection id="dg_weapons32">
+        <grid name="Default" x="0" y="0" cell-width="32" cell-height="32" anchor-x="16" anchor-y="24">
+            <tile x="0" y="5">
+                <tag>item.sword</tag>
+            </tile>
+        </grid>
+    </collection>
+    <collection id="townactions">
+        <grid name="Default" x="0" y="0" cell-width="32" cell-height="32" anchor-x="16" anchor-y="24">
+            <tile x="5" y="5">
+                <tag>item.bag</tag>
+            </tile>
+        </grid>
+    </collection>
+    <collection id="dg_people32">
+        <grid name="Default" x="0" y="0" cell-width="32" cell-height="32" anchor-x="16" anchor-y="24">
+            <tile x="0" y="0">
+                <tag>character.player</tag>
+            </tile>
+            <tile x="1" y="0">
+                <tag>character.farmer</tag>
+            </tile>
+            <tile x="2" y="0">
+                <tag>character.peasant</tag>
+            </tile>
+            <tile x="3" y="0">
+                <tag>character.peasant</tag>
+            </tile>
+            <tile x="0" y="1">
+                <tag>character.jester</tag>
+            </tile>
+            <tile x="1" y="1">
+                <tag>character.peasant</tag>
+            </tile>
+            <tile x="2" y="1">
+                <tag>character.peasant</tag>
+            </tile>
+            <tile x="3" y="1">
+                <tag>character.thief</tag>
+            </tile>
+            <tile x="0" y="2">
+                <tag>character.drunkard</tag>
+            </tile>
+            <tile x="1" y="2">
+                <tag>character.player</tag>
+            </tile>
+            <tile x="2" y="2">
+                <tag>character.fighter</tag>
+            </tile>
+            <tile x="3" y="2">
+                <tag>character.fighter</tag>
+            </tile>
+        </grid>
+    </collection>
+</tile-set>

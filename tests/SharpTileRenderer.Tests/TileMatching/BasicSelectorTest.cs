@@ -65,6 +65,7 @@ namespace SharpTileRenderer.Tests.TileMatching
     <layer>
       <id>test-layer</id>
       <enabled>true</enabled>
+      <sort-order>TopDownLeftRight</sort-order>
       <ts:basic>
         <ts:prefix>t.prefix.</ts:prefix>
       </ts:basic>
@@ -76,6 +77,7 @@ namespace SharpTileRenderer.Tests.TileMatching
 renderLayers:
   - id: test-layer
     enabled: true
+    sortingOrder: TopDownLeftRight
     match:
       kind: basic
       prefix: t.prefix.

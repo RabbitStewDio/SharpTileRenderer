@@ -6,6 +6,7 @@ using SharpTileRenderer.TileMatching;
 using SharpTileRenderer.TileMatching.DataSets;
 using SharpTileRenderer.TileMatching.Model.Selectors;
 using SharpTileRenderer.TileMatching.Selectors;
+using SharpTileRenderer.TileMatching.Selectors.BuiltIn;
 using System;
 using System.Collections.Generic;
 
@@ -34,9 +35,11 @@ namespace SharpTileRenderer.Tests.TileMatching
     <layer>
       <id>test-layer</id>
       <enabled>true</enabled>
+      <sort-order>TopDownLeftRight</sort-order>
       <ts:corner>
         <ts:prefix>prefix.</ts:prefix>
         <ts:context-data-set>context-data</ts:context-data-set>
+        <ts:default-class>B-class</ts:default-class>
         <ts:matches>
           <ts:class>A-class</ts:class>
           <ts:class>B-class</ts:class>
@@ -50,6 +53,7 @@ namespace SharpTileRenderer.Tests.TileMatching
 renderLayers:
   - id: test-layer
     enabled: true
+    sortingOrder: TopDownLeftRight
     match:
       kind: corner
       prefix: prefix.
@@ -57,6 +61,7 @@ renderLayers:
       matches:
         - A-class
         - B-class
+      defaultClass: B-class
 ";
 
         protected override (CornerSelectorModel, ISpriteMatcher<GraphicTag>) CreateSpriteMatcher()
@@ -120,7 +125,16 @@ renderLayers:
         [Test]
         public void ValidateSelectorInvalid()
         {
-            var (_, spriteMatcher) = CreateSpriteMatcher();
+            var sm = new CornerSelectorModel()
+            {
+                Matches = { "A-class", "B-class" },
+                Prefix = "prefix.",
+                ContextDataSet = "context-data",
+            };
+            var factory = new MatcherFactory<EntityClassification16>();
+            factory.WithDefaultMatchers();
+
+            var spriteMatcher = factory.CreateTagMatcher(sm, MatchFactoryContextFixture?.FactoryContext ?? throw new NullReferenceException());
             var input = SpriteMatcherInput.From(GraphicTag.From("invalid"), new ContinuousMapCoordinate(5f, 5f));
             var resultCollector = new List<(SpriteTag tag, SpritePosition spriteOffset, ContinuousMapCoordinate pos)>();
 

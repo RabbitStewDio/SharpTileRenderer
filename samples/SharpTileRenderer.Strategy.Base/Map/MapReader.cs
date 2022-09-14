@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace SharpTileRenderer.Strategy.Base.Map
 {
@@ -13,6 +12,7 @@ namespace SharpTileRenderer.Strategy.Base.Map
         readonly Dictionary<char, ITerrain> terrainsByCharId;
         readonly Dictionary<char, ITerrainResource> resourcesByCharId;
         readonly Dictionary<char, IRoadType> roadsByCharId;
+        readonly Dictionary<char, IRoadType> riversByCharId;
         readonly Dictionary<char, TerrainImprovement> improvementByCharId;
 
         public MapReader(StrategyGameRules rules, TerrainMap map)
@@ -26,6 +26,7 @@ namespace SharpTileRenderer.Strategy.Base.Map
             this.terrainsByCharId = rules.TerrainTypes.Contents.Select(e => e.value).ToDict(t => t.AsciiId);
             this.resourcesByCharId = rules.TerrainResourceTypes.Contents.Select(e => e.value).ToDict(r => r.AsciiId);
             this.roadsByCharId = rules.RoadTypes.Contents.Select(e => e.value).Where(r => !r.River).ToDict(r => r.AsciiId);
+            this.riversByCharId = rules.RoadTypes.Contents.Select(e => e.value).Where(r => r.River).ToDict(r => r.AsciiId);
             this.improvementByCharId = rules.TerrainImprovementTypes.Contents.Select(e => e.value).ToDict(r => r.AsciiId);
         }
 
@@ -65,19 +66,17 @@ namespace SharpTileRenderer.Strategy.Base.Map
             if (roadsByCharId.TryGetValue(c, out var t))
             {
                 var v = Map[x, targetY];
-                var riverState = v.RoadsAndRiver & RoadTypeId.River;
-                v = v.WithRoad(t.DataId | riverState);
+                v = v.WithRoad(t.DataId);
                 Map[x, targetY] = v;
             }
         }
 
         void ReadRiversHandler(char c, int x, int targetY)
         {
-            if (roadsByCharId.TryGetValue(c, out var t))
+            if (c != ' ' && riversByCharId.TryGetValue(c, out var t))
             {
                 var v = Map[x, targetY];
-                var roadState = v.RoadsAndRiver & ~RoadTypeId.River;
-                v = v.WithRoad(t.DataId | roadState);
+                v = v.WithRiver(t.DataId);
                 Map[x, targetY] = v;
             }
         }
@@ -143,45 +142,6 @@ namespace SharpTileRenderer.Strategy.Base.Map
             }
 
             return maxX;
-        }
-    }
-
-    public static class MapReaderExtensions
-    {
-        public static string Strip(this string text, char barrier = '|')
-        {
-            var nl = Environment.NewLine;
-            var sr = new StringReader(text);
-            var line = sr.ReadLine();
-            var result = new StringBuilder();
-            var firstLine = true;
-            while (line != null)
-            {
-                if (!firstLine)
-                {
-                    result.Append(nl);
-                }
-
-                int idx = line.IndexOf(barrier);
-                if (idx >= 0)
-                {
-                    result.Append(line.Substring(idx + 1));
-                    firstLine = false;
-                }
-                else if (result.Length == 0 && line.Length == 0)
-                {
-                    // skip leading empty lines.
-                }
-                else
-                {
-                    result.Append(line);
-                    firstLine = false;
-                }
-
-                line = sr.ReadLine();
-            }
-
-            return result.ToString();
         }
     }
 }

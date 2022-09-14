@@ -20,6 +20,7 @@ namespace SharpTileRenderer.Tests.TileMatching
     <layer>
       <id>test-layer</id>
       <enabled>true</enabled>
+      <sort-order>TopDownLeftRight</sort-order>
       <ts:neighbour-overlay>
         <ts:prefix>prefix.</ts:prefix>
         <ts:context-data-set>context-data</ts:context-data-set>
@@ -39,6 +40,7 @@ namespace SharpTileRenderer.Tests.TileMatching
 renderLayers:
   - id: test-layer
     enabled: true
+    sortingOrder: TopDownLeftRight
     match:
       kind: neighbour-overlay
       prefix: prefix.

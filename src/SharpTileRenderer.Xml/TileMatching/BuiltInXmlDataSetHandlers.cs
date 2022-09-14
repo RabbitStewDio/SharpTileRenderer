@@ -5,12 +5,12 @@ namespace SharpTileRenderer.Xml.TileMatching
 {
     public static class BuiltInXmlDataSetHandlers
     {
-        static readonly XName quantifiedTagDataTag = XmlTileMatcherModelTags.NS + "quantified-tag-data";
-        static readonly XName tagDataTag = XmlTileMatcherModelTags.NS + "tag-data";
-        static readonly XName quantifiedClassSetTag = XmlTileMatcherModelTags.NS + "quantified-class-set";
-        static readonly XName classSetTag = XmlTileMatcherModelTags.NS + "class-set";
-        static readonly XName defaultQuantityTag = XmlTileMatcherModelTags.NS + "default-quantity";
-        static readonly XName defaultClassTag = XmlTileMatcherModelTags.NS + "default-class";
+        static readonly XName quantifiedTagDataTag = XmlTileMatcherModelTags.Ns + "quantified-tag-data";
+        static readonly XName tagDataTag = XmlTileMatcherModelTags.Ns + "tag-data";
+        static readonly XName quantifiedClassSetTag = XmlTileMatcherModelTags.Ns + "quantified-class-set";
+        static readonly XName classSetTag = XmlTileMatcherModelTags.Ns + "class-set";
+        static readonly XName defaultQuantityTag = XmlTileMatcherModelTags.Ns + "default-quantity";
+        static readonly XName defaultClassTag = XmlTileMatcherModelTags.Ns + "default-class";
 
         
         public static TSettings ConfigureBuiltInDataSetReadHandlers<TSettings>(this TSettings c)

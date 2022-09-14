@@ -2,7 +2,8 @@
 {
     public enum LayerQueryType
     {
-        Grid,
-        Sparse
+        Grid = 0,
+        Sparse = 1,
+        Combined = 2
     }
 }

@@ -36,6 +36,7 @@ namespace SharpTileRenderer.Tests.TileMatching
     <layer>
       <id>test-layer</id>
       <enabled>true</enabled>
+      <sort-order>TopDownLeftRight</sort-order>
       <ts:choice>
         <ts:choice-selection>
           <ts:choice-matches>
@@ -62,6 +63,7 @@ namespace SharpTileRenderer.Tests.TileMatching
 renderLayers:
   - id: test-layer
     enabled: true
+    sortingOrder: TopDownLeftRight
     match:
       kind: choice
       choices:

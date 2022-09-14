@@ -20,6 +20,9 @@ namespace SharpTileRenderer.TileMatching.Model.Selectors
         [DataMember(Order = 2)]
         string? contextDataSet;
 
+        [DataMember(Order = 3)]
+        string? forceGraphic;
+        
         [IgnoreDataMember]
         public bool IsQuantifiedSelector => false;
 
@@ -31,6 +34,19 @@ namespace SharpTileRenderer.TileMatching.Model.Selectors
             RegisterObservableList(nameof(MatchWith), MatchWith);
         }
 
+        [IgnoreDataMember]
+        public string? ForceGraphic
+        {
+            get { return forceGraphic; }
+            set
+            {
+                if (value == forceGraphic) return;
+                forceGraphic = value;
+                OnPropertyChanged();
+            }
+        }
+
+        [IgnoreDataMember]
         public string? Prefix
         {
             get
@@ -45,6 +61,7 @@ namespace SharpTileRenderer.TileMatching.Model.Selectors
             }
         }
 
+        [IgnoreDataMember]
         public string? ContextDataSet
         {
             get
@@ -59,10 +76,10 @@ namespace SharpTileRenderer.TileMatching.Model.Selectors
             }
         }
 
-        [DataMember(Order = 3)]
+        [DataMember(Order = 4)]
         public ObservableCollection<string> MatchSelf { get; }
 
-        [DataMember(Order = 4)]
+        [DataMember(Order = 5)]
         public ObservableCollection<string> MatchWith { get; }
 
         public bool Equals(ISelectorModel other)

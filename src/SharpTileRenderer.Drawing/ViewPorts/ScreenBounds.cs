@@ -18,6 +18,7 @@ namespace SharpTileRenderer.Drawing.ViewPorts
             Height = height;
         }
 
+        public ScreenPosition TopLeft => new ScreenPosition(X, Y);
         public ScreenPosition Center => new ScreenPosition(X + Width / 2, Y + Height / 2);
 
         public bool Equals(ScreenBounds other)

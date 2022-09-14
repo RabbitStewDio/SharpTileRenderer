@@ -57,7 +57,7 @@ namespace SharpTileRenderer.Drawing
 
             public TagRenderFactoryDataWithMatcher<TEntity> WithMatcher<TClass>(ISelectorModel model,
                                                                                 IMatcherFactory<TClass> matchFactory,
-                                                                                IMatchFactoryContext<TClass> context) 
+                                                                                IMatchFactoryContext<TClass> context)
                 where TClass : struct, IEntityClassification<TClass>
             {
                 return new TagRenderFactoryDataWithMatcher<TEntity>(coreData, matchFactory.CreateTagMatcher(model, context), entityQuery);
@@ -79,15 +79,15 @@ namespace SharpTileRenderer.Drawing
                 this.primaryQuery = primaryQuery;
             }
 
-            public ILayer Build(ITileDataSetProducer<TEntity> p,
-                                                     ITileRenderer<(TEntity, int)> renderer,
-                                                     int quantity = 1)
+            public ILayer<TEntity> Build(ITileDataSetProducer<TEntity> p,
+                                         ITileRenderer<(TEntity, int)> renderer,
+                                         int quantity = 1)
             {
                 return Build(p, new EnrichQuantityTileRenderer<TEntity, int>(renderer, quantity));
             }
 
-            public ILayer Build(ITileDataSetProducer<TEntity> p,
-                                                     ITileRenderer<TEntity> renderer)
+            public ILayer<TEntity> Build(ITileDataSetProducer<TEntity> p,
+                                         ITileRenderer<TEntity> renderer)
             {
                 if (!FindDataSourceDefinition(coreData.Models, primaryQuery).TryGetValue(out var model))
                 {

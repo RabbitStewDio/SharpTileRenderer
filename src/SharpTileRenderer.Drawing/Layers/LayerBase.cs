@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace SharpTileRenderer.Drawing.Layers
 {
-    public abstract class LayerBase<TQueryData, TEntity> : ILayer
+    public abstract class LayerBase<TQueryData, TEntity> : ILayer<TEntity>
     {
         readonly ObjectPool<List<ScreenRenderInstruction<TEntity>>> pool;
         readonly List<ScreenRenderInstruction<TEntity>> renderInstructionBuffer;
@@ -27,8 +27,8 @@ namespace SharpTileRenderer.Drawing.Layers
         protected readonly ILayerTileResolver<TQueryData, TEntity> TileResolver;
         protected readonly ITileDataSet<TQueryData, TEntity> PrimaryDataSet;
 
-        public LayerBase(string name, 
-                         ILayerTileResolver<TQueryData, TEntity> tileResolver, 
+        public LayerBase(string name,
+                         ILayerTileResolver<TQueryData, TEntity> tileResolver,
                          ITileDataSet<TQueryData, TEntity> primaryDataSet,
                          RenderingSortOrder renderSortOrder,
                          ITileRenderer<TEntity> renderer)
@@ -40,7 +40,7 @@ namespace SharpTileRenderer.Drawing.Layers
             this.renderSortOrder = renderSortOrder;
             this.renderer = renderer ?? throw new ArgumentNullException(nameof(renderer));
             this.ThreadSafePreparation = tileResolver.IsThreadSafe && primaryDataSet.MetaData.IsThreadSafe;
-            
+
             this.QueryBufferPool = new DefaultObjectPool<List<SparseTagQueryResult<TQueryData, TEntity>>>(new ListObjectPolicy<SparseTagQueryResult<TQueryData, TEntity>>());
             this.renderInstructionBuffer = new List<ScreenRenderInstruction<TEntity>>();
             this.taskBuffer = new List<(ConfiguredValueTaskAwaitable, List<ScreenRenderInstruction<TEntity>>)>();
@@ -49,7 +49,9 @@ namespace SharpTileRenderer.Drawing.Layers
 
         public string Name { get; }
 
-        public async ValueTask PrepareRenderLayerAsync(IViewPort v, List<QueryPlan> queryPlans,  CancellationToken cancelToken)
+        public IReadOnlyList<ScreenRenderInstruction<TEntity>> RenderBuffer => renderInstructionBuffer;
+
+        public async ValueTask PrepareRenderLayerAsync(IViewPort v, List<QueryPlan> queryPlans, CancellationToken cancelToken)
         {
             renderInstructionBuffer.Clear();
             taskBuffer.Clear();
@@ -71,7 +73,7 @@ namespace SharpTileRenderer.Drawing.Layers
                 pool.Return(renderInstructions);
             }
 
-            await Task.Factory.StartNew(ResolveRenderPosition,
+            await Task.Factory.StartNew(SortForScreenRenderPosition,
                                         cancelToken, TaskCreationOptions.None,
                                         TaskScheduler.Default)
                       .ConfigureAwait(!ThreadSafePreparation);
@@ -94,10 +96,10 @@ namespace SharpTileRenderer.Drawing.Layers
                 pool.Return(bufferList);
             }
 
-            ResolveRenderPosition();
+            SortForScreenRenderPosition();
         }
 
-        void ResolveRenderPosition()
+        void SortForScreenRenderPosition()
         {
             var comparer = renderSortOrder.AsComparer<TEntity>();
             renderInstructionBuffer.Sort(comparer);
@@ -119,9 +121,9 @@ namespace SharpTileRenderer.Drawing.Layers
         public bool ThreadSafePreparation { get; }
 
         protected virtual ValueTask PostProcessTilesAsync(IViewPort v,
-                                                  List<RenderInstruction<TEntity>> tileBuffer,
-                                                  List<ScreenRenderInstruction<TEntity>> resultBuffer,
-                                                  CancellationToken cancellationToken)
+                                                          List<RenderInstruction<TEntity>> tileBuffer,
+                                                          List<ScreenRenderInstruction<TEntity>> resultBuffer,
+                                                          CancellationToken cancellationToken)
         {
             return new ValueTask(Task.Factory.StartNew(() => PostProcessTiles(v, tileBuffer, resultBuffer), cancellationToken));
         }
@@ -132,8 +134,8 @@ namespace SharpTileRenderer.Drawing.Layers
         /// <param name="v"></param>
         /// <param name="tileBuffer"></param>
         /// <param name="resultBuffer"></param>
-        protected virtual void PostProcessTiles(IViewPort v, 
-                                                List<RenderInstruction<TEntity>> tileBuffer, 
+        protected virtual void PostProcessTiles(IViewPort v,
+                                                List<RenderInstruction<TEntity>> tileBuffer,
                                                 List<ScreenRenderInstruction<TEntity>> resultBuffer)
         {
             var gridType = v.GridType;

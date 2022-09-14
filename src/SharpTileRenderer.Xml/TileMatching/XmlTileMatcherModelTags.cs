@@ -4,42 +4,45 @@ namespace SharpTileRenderer.Xml.TileMatching
 {
     public static class XmlTileSelectorModelTags
     {
-        public static readonly XNamespace NS = "https://docs.rabbit-stew-dio.com/xml-schema/tileselector/v1/";
-        public static readonly XName prefixTag = XmlTileSelectorModelTags.NS + "prefix";
-        public static readonly XName contextDataSetTag = XmlTileSelectorModelTags.NS + "context-data-set";
-        public static readonly XName matchClassTag = XmlTileSelectorModelTags.NS + "class";
-        public static readonly XName defaultClassTag = XmlTileSelectorModelTags.NS + "default-class";
+        public static readonly XNamespace Ns = "https://docs.rabbit-stew-dio.com/xml-schema/tileselector/v1/";
+        public static readonly XName PrefixTag = XmlTileSelectorModelTags.Ns + "prefix";
+        public static readonly XName SuffixTag = XmlTileSelectorModelTags.Ns + "suffix";
+        public static readonly XName ContextDataSetTag = XmlTileSelectorModelTags.Ns + "context-data-set";
+        public static readonly XName MatchClassTag = XmlTileSelectorModelTags.Ns + "class";
+        public static readonly XName DefaultClassTag = XmlTileSelectorModelTags.Ns + "default-class";
+        public static readonly XName ForceGraphicTag = XmlTileSelectorModelTags.Ns + "force-graphic";
     }
     
     public static class XmlTileMatcherModelTags
     {
-        public static readonly XNamespace NS = "https://docs.rabbit-stew-dio.com/xml-schema/tilematcher/v1/";
-        public static readonly XName TileSpecTag = NS + "tile-set";
-        public static readonly XName AuthorTag = NS + "author";
-        public static readonly XName DocumentationTag = NS + "documentation";
-        public static readonly XName VersionTag = NS + "version";
-        public static readonly XName DataSetsTag = NS + "data-sets";
-        public static readonly XName LayersTag = NS + "layers";
-        public static readonly XName TagsTag = NS + "tags";
-        public static readonly XName FeatureFlagsTag = NS + "feature-flags";
-        public static readonly XName FeatureFlagTag = NS + "feature-flag";
-        public static readonly XName FlagsTag = NS + "flags";
-        public static readonly XName FlagTag = NS + "flag";
-        public static readonly XName GraphicTagTag = NS + "graphic-tag";
-        public static readonly XName LayerTag = NS + "layer";
-        public static readonly XName IdTag = NS + "id";
-        public static readonly XName LayerIdTag = NS + "layer-id";
-        public static readonly XName EnabledTag = NS + "enabled";
-        public static readonly XName RenderOrder = NS + "render-order";
-        public static readonly XName EntitySourceTag = NS + "entity-source";
-        public static readonly XName EntityQueryIdTag = NS + "entity-query-id";
-        public static readonly XName EntitySortOrderTag = NS + "sort-order";
-        public static readonly XName EntityQueryTypeTag = NS + "query-type";
-        public static readonly XName ClassesTag = NS + "classes";
-        public static readonly XName ClassTag = NS + "class";
-        public static readonly XName PropertiesTag = NS + "properties";
-        public static readonly XName PropertyTag = NS + "property";
-        public static readonly XName NameTag = NS + "name";
-        public static readonly XName ValueTag = NS + "value";
+        public static readonly XNamespace Ns = "https://docs.rabbit-stew-dio.com/xml-schema/tilematcher/v1/";
+        public static readonly XName TileSpecTag = Ns + "tile-set";
+        public static readonly XName AuthorTag = Ns + "author";
+        public static readonly XName DocumentationTag = Ns + "documentation";
+        public static readonly XName VersionTag = Ns + "version";
+        public static readonly XName DataSetsTag = Ns + "data-sets";
+        public static readonly XName LayersTag = Ns + "layers";
+        public static readonly XName TagsTag = Ns + "tags";
+        public static readonly XName FeatureFlagsTag = Ns + "feature-flags";
+        public static readonly XName FeatureFlagTag = Ns + "feature-flag";
+        public static readonly XName FlagsTag = Ns + "flags";
+        public static readonly XName FlagTag = Ns + "flag";
+        public static readonly XName GraphicTagTag = Ns + "graphic-tag";
+        public static readonly XName LayerTag = Ns + "layer";
+        public static readonly XName SubLayerTag = Ns + "sub-layer";
+        public static readonly XName IdTag = Ns + "id";
+        public static readonly XName LayerIdTag = Ns + "layer-id";
+        public static readonly XName EnabledTag = Ns + "enabled";
+        public static readonly XName RenderOrder = Ns + "render-order";
+        public static readonly XName EntitySourceTag = Ns + "entity-source";
+        public static readonly XName EntityQueryIdTag = Ns + "entity-query-id";
+        public static readonly XName EntitySortOrderTag = Ns + "sort-order";
+        public static readonly XName EntityQueryTypeTag = Ns + "query-type";
+        public static readonly XName ClassesTag = Ns + "classes";
+        public static readonly XName ClassTag = Ns + "class";
+        public static readonly XName PropertiesTag = Ns + "properties";
+        public static readonly XName PropertyTag = Ns + "property";
+        public static readonly XName NameTag = Ns + "name";
+        public static readonly XName ValueTag = Ns + "value";
     }
 }

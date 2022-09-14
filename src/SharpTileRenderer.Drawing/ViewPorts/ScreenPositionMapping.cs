@@ -8,25 +8,27 @@ using System.Diagnostics;
 
 namespace SharpTileRenderer.Drawing.ViewPorts
 {
-    public class ScreenPositionMapping: IScreenPositionMapper
+    public class ScreenPositionMapping : IScreenPositionMapper
     {
         static readonly ILogger logger = SLog.ForContext<ScreenPositionMapping>();
 
+        readonly GridType gridType;
         readonly ScreenPositionMapper mapper;
         IMapNavigator<GridDirection>? navigator;
         Optional<NavigatorMetaData> metaData;
         Optional<MapArea> bounds;
 
-        public ScreenPositionMapping(ScreenPositionMapper mapper)
+        public ScreenPositionMapping(GridType gridType, IntDimension tileSize)
         {
-            this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            this.gridType = gridType;
+            this.mapper = new ScreenPositionMapper(gridType, tileSize);
         }
 
         IMapNavigator<GridDirection> Fetch(NavigatorMetaData md)
         {
             var normalizedMetaData = md.WithoutHorizontalOperation()
                                        .WithoutVerticalOperation();
-            
+
             if (metaData.TryGetValue(out var cachedMd) && normalizedMetaData == cachedMd)
             {
                 Debug.Assert(navigator != null, nameof(navigator) + " != null");
@@ -51,9 +53,10 @@ namespace SharpTileRenderer.Drawing.ViewPorts
         public void Refresh(IViewPort v)
         {
             var centre = v.Focus;
+            var tileBounds = v.TileBounds;
             var queryArea = new MapArea(centre.Normalize(),
-                                        (int)Math.Ceiling(v.TileBounds.Width / 2),
-                                        (int)Math.Ceiling(v.TileBounds.Height / 2));
+                                        (int)Math.Ceiling(tileBounds.Width / 2),
+                                        (int)Math.Ceiling(tileBounds.Height / 2));
             if (bounds.TryGetValue(out var cachedBounds) && cachedBounds == queryArea)
             {
                 return;
@@ -61,7 +64,7 @@ namespace SharpTileRenderer.Drawing.ViewPorts
 
             bounds = queryArea;
             mapper.Clear();
-            
+
             switch (v.TileShape)
             {
                 case TileShape.Grid:
@@ -89,7 +92,7 @@ namespace SharpTileRenderer.Drawing.ViewPorts
             var origin = viewToWorld.VirtualCoordinate.Normalize();
             var tileSize = v.TileSize;
             var tileBounds = activeArea / tileSize;
-            var mapNavigator = v.Navigation[MapNavigationType.Screen];
+            var mapNavigator = v.Navigation[MapNavigationType.Map];
             var mapNav = Fetch(mapNavigator.MetaData);
 
 
@@ -103,7 +106,7 @@ namespace SharpTileRenderer.Drawing.ViewPorts
                     {
                         mapper.AddPhysical(mc, lineOriginScreen);
                     }
-                    
+
                     mapper.AddVirtual(lineOrigin, lineOriginScreen);
 
                     if (!mapNav.NavigateTo(GridDirection.East, lineOrigin, out lineOrigin))
@@ -122,20 +125,34 @@ namespace SharpTileRenderer.Drawing.ViewPorts
                 screenPos = new ScreenPosition(screenPos.X, lineOriginScreen.Y + tileSize.Height);
             }
         }
-        
+
         void ProcessIsometric(IViewPort v)
         {
+            var normalizedNavigator = v.Navigation[MapNavigationType.Screen];
+            var mapNavigator = Fetch(normalizedNavigator.MetaData);
+
+
+            // represents the rendered tile area
             var activeBounds = v.PixelBounds + v.PixelOverdraw + new ScreenInsets(v.TileSize.Height, v.TileSize.Width);
-            var screenPos = new ScreenPosition(activeBounds.X, activeBounds.Y);
-            var origin = v.ScreenSpaceNavigator.TranslateViewToWorld(v, screenPos).VirtualCoordinate.Normalize();
+            // represents the focus point, the map position directly under the center of the active bounds area
+            var focusPointScreen = v.PixelBounds.Center;
+            var centerRaw = v.ScreenSpaceNavigator.TranslateViewToWorld(v, focusPointScreen).VirtualCoordinate;
+            var tilesToBoundsOriginPx = (focusPointScreen - activeBounds.TopLeft);
+            var tilesToBoundsOrigin = ((int)Math.Ceiling(tilesToBoundsOriginPx.X / v.TileSize.Width),
+                                       (int)Math.Ceiling(tilesToBoundsOriginPx.Y / v.TileSize.Height));
+
+            mapNavigator.NavigateTo(GridDirection.North, centerRaw.Normalize(), out var origin, tilesToBoundsOrigin.Item2);
+            mapNavigator.NavigateTo(GridDirection.West, origin, out origin, tilesToBoundsOrigin.Item1);
+
+            var screenPos = new ScreenPosition(focusPointScreen.X - tilesToBoundsOrigin.Item1 * v.TileSize.Width, 
+                                               focusPointScreen.Y - tilesToBoundsOrigin.Item2 * v.TileSize.Height);
 
             var tileSize = v.TileSize;
             var tileBounds = activeBounds / tileSize;
-            
-            var mapNavigator = v.Navigation[MapNavigationType.Screen].AsVirtualNavigator();
-            var normalizedNavigator = v.Navigation[MapNavigationType.Screen];
-            logger.Debug("== Using navigator {Navigator}", normalizedNavigator.MetaData);
-            
+
+
+            logger.Debug("== Using navigator {Navigator} with origin {Origin}", normalizedNavigator.MetaData, origin);
+
             for (int stepY = 0; stepY < tileBounds.Height * 2; stepY += 1)
             {
                 logger.Debug("== Processing Screen={ScreenPos} Map={Origin}", screenPos, origin);
@@ -149,7 +166,7 @@ namespace SharpTileRenderer.Drawing.ViewPorts
                         mapper.AddVirtual(mc, lineOriginScreen);
                         logger.Debug("   Physical Screen={LineOriginScreen} Map={MapCoordinate}", lineOriginScreen, mc);
                     }
-                    
+
                     mapper.AddVirtual(lineOrigin, lineOriginScreen);
                     logger.Debug("   Virtual Screen={LineOriginScreen} Map={LineOrigin}", lineOriginScreen, lineOrigin);
 
@@ -166,7 +183,7 @@ namespace SharpTileRenderer.Drawing.ViewPorts
                 {
                     break;
                 }
-                
+
                 screenPos = new ScreenPosition(screenPos.X + navFactor * (tileSize.Width / 2f), lineOriginScreen.Y + tileSize.Height / 2f);
             }
         }

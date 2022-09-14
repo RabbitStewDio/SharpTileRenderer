@@ -86,7 +86,6 @@
         <xsd:all>
             <xsd:element name="entity-query-id" type="xsd:string"/>
             <xsd:element name="query-type" type="layerQueryTypeEnum" minOccurs="0"/>
-            <xsd:element name="sort-order" type="renderingSortOrderEnum" minOccurs="0"/>
         </xsd:all>
     </xsd:complexType>
 
@@ -95,11 +94,41 @@
             <xsd:element name="layer-id" type="xsd:string"/>
             <xsd:element name="enabled" type="xsd:boolean" minOccurs="0"/>
             <xsd:element name="render-order" type="xsd:int" minOccurs="0"/>
-            <xsd:element name="entity-source" type="entitySourceElement"/>
+            <xsd:element name="sort-order" type="renderingSortOrderEnum" minOccurs="0"/>
             <xsd:element name="feature-flags" type="featureFlagsElement" minOccurs="0"/>
             <xsd:element name="properties" type="propertiesElement" minOccurs="0"/>
-            <xsd:choice maxOccurs="unbounded">
-                <xsd:element ref="matcherAbstract"/>
+            <xsd:choice>
+                <xsd:sequence>
+                    <xsd:element name="entity-source" type="entitySourceElement"/>
+                    <xsd:choice maxOccurs="unbounded">
+                        <xsd:element ref="matcherAbstract"/>
+                    </xsd:choice>
+                </xsd:sequence>
+                <xsd:sequence>
+                    <xsd:element name="sub-layer" type="subLayerElement" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:choice>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="subLayerElement">
+        <xsd:sequence>
+            <xsd:element name="layer-id" type="xsd:string"/>
+            <xsd:element name="enabled" type="xsd:boolean" minOccurs="0"/>
+            <xsd:element name="render-order" type="xsd:int" minOccurs="0"/>
+            <xsd:element name="sort-order" type="renderingSortOrderEnum" minOccurs="0"/>
+            <xsd:element name="feature-flags" type="featureFlagsElement" minOccurs="0"/>
+            <xsd:element name="properties" type="propertiesElement" minOccurs="0"/>
+            <xsd:choice>
+                <xsd:sequence>
+                    <xsd:element name="entity-source" type="entitySourceElement"/>
+                    <xsd:choice maxOccurs="unbounded">
+                        <xsd:element ref="matcherAbstract"/>
+                    </xsd:choice>
+                </xsd:sequence>
+                <xsd:sequence>
+                    <xsd:element name="sub-layer" type="subLayerElement" maxOccurs="unbounded"/>
+                </xsd:sequence>
             </xsd:choice>
         </xsd:sequence>
     </xsd:complexType>
@@ -112,8 +141,8 @@
 
     <xsd:simpleType name="layerQueryTypeEnum">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="grid"/>
-            <xsd:enumeration value="sparse"/>
+            <xsd:enumeration value="Grid"/>
+            <xsd:enumeration value="Sparse"/>
         </xsd:restriction>
     </xsd:simpleType>
 

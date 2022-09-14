@@ -117,13 +117,11 @@ namespace SharpTileRenderer.Xml.TileMatching
             }
             
             var entityQuery = (string?)entitySource.Element(XmlTileMatcherModelTags.EntityQueryIdTag) ?? throw new XmlParseException($"Missing child element {XmlTileMatcherModelTags.EntityQueryIdTag}", entitySource);
-            var sortOrder = entitySource.ParseEnumElement<RenderingSortOrder>(XmlTileMatcherModelTags.EntitySortOrderTag, RenderingSortOrder.TopDownLeftRight) ?? throw new XmlParseException($"Missing child element {XmlTileMatcherModelTags.EntitySortOrderTag}", entitySource);
             var entityQueryType = entitySource.ParseEnumElement<LayerQueryType>(XmlTileMatcherModelTags.EntityQueryTypeTag, LayerQueryType.Grid) ?? throw new XmlParseException($"Missing child element {XmlTileMatcherModelTags.EntityQueryTypeTag}", entitySource);
             return new EntitySourceModel()
             {
                 EntityQueryId = entityQuery,
                 LayerQueryType = entityQueryType,
-                SortingOrder = sortOrder
             };
         }
         
@@ -132,29 +130,43 @@ namespace SharpTileRenderer.Xml.TileMatching
             var id = (string?)layer.Element(XmlTileMatcherModelTags.LayerIdTag);
             var enabled = "true".Equals((string?)layer.Element(XmlTileMatcherModelTags.EnabledTag) ?? "true", StringComparison.InvariantCulture);
 
+            var sortOrder = layer.ParseEnumElement<RenderingSortOrder>(XmlTileMatcherModelTags.EntitySortOrderTag, RenderingSortOrder.TopDownLeftRight) ?? throw new XmlParseException($"Missing child element {XmlTileMatcherModelTags.EntitySortOrderTag}", layer);
             var entitySource = ParseEntitySource(layer.Element(XmlTileMatcherModelTags.EntitySourceTag));
+            var renderOrder = ((int?)layer.Element(XmlTileMatcherModelTags.RenderOrder)) ?? 0;
             var matchElements = layer.Elements();
+            var renderLayerModel = new RenderLayerModel()
+            {
+                Id = id,
+                EntitySource = entitySource,
+                RenderOrder = renderOrder,
+                SortingOrder = sortOrder,
+                Enabled = enabled
+            };
+            
+            layer.ParseProperties(renderLayerModel.Properties);
+            layer.ParseStringListElement(XmlTileMatcherModelTags.FeatureFlagsTag, XmlTileMatcherModelTags.FeatureFlagTag, renderLayerModel.FeatureFlags);
+            
             foreach (var me in matchElements)
             {
                 if (ParseSelector(me).TryGetValue(out var m))
                 {
-                    var renderOrder = ((int?)layer.Element(XmlTileMatcherModelTags.RenderOrder)) ?? 0;
-                    var renderLayerModel = new RenderLayerModel()
-                    {
-                        Id = id,
-                        EntitySource = entitySource,
-                        Match = m,
-                        RenderOrder = renderOrder,
-                        Enabled = enabled
-                    };
-            
-                    layer.ParseProperties(renderLayerModel.Properties);
-                    layer.ParseStringListElement(XmlTileMatcherModelTags.FeatureFlagsTag, XmlTileMatcherModelTags.FeatureFlagTag, renderLayerModel.FeatureFlags);
+                    renderLayerModel.Match = m;
                     return renderLayerModel;
                 }
             }
 
-            throw new XmlParseException("Unable to find valid match definition", layer);
+            var subLayers = layer.Elements(XmlTileMatcherModelTags.SubLayerTag);
+            foreach (var subLayer in subLayers)
+            {
+                renderLayerModel.SubLayers.Add(ParseLayer(subLayer));
+            }
+
+            if (renderLayerModel.SubLayers.Count == 0)
+            {
+                throw new XmlParseException("Unable to find valid match definition", layer);
+            }
+
+            return renderLayerModel;
         }
 
         public Optional<ISelectorModel> ParseSelector(XElement me)
