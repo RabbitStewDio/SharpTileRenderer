@@ -24,10 +24,10 @@ namespace SharpTileRenderer.Tests.Drawing
         [Test]
         public void Test()
         {
-            converter.ScreenToMap(viewPort, new ScreenPosition(0, 0)).Should().Be(new VirtualMapCoordinate(-8.75f, 1.25f));
+            converter.ScreenToMap(viewPort, new ScreenPosition(0, 0)).Should().Be(new VirtualMapCoordinate(-1.25f, -8.75f));
             converter.ScreenToMap(viewPort, new ScreenPosition(160, 120)).Should().Be(new VirtualMapCoordinate(0, 0));
-            converter.ScreenToMap(viewPort, new ScreenPosition(160 + 16, 120 + 16)).Should().Be(new VirtualMapCoordinate(1, 0));
-            converter.ScreenToMap(viewPort, new ScreenPosition(160 + 32, 120 + 32)).Should().Be(new VirtualMapCoordinate(2, 0));
+            converter.ScreenToMap(viewPort, new ScreenPosition(160 + 16, 120 + 16)).Should().Be(new VirtualMapCoordinate(0, 1));
+            converter.ScreenToMap(viewPort, new ScreenPosition(160 + 32, 120 + 32)).Should().Be(new VirtualMapCoordinate(0, 2));
         }
     }
 }

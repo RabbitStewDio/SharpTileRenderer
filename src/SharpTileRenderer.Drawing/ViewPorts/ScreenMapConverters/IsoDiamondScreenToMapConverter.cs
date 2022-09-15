@@ -19,9 +19,9 @@
             // Note: Grid coordinates are 1-unit based, 
             //       as opposed to the 4-unit based view coordinates 
             var grid = GridMap(vp, p);
-            var mouseGridX = (grid.Y + grid.X);
-            var mouseGridY = (grid.Y - grid.X);
-            return new VirtualMapCoordinate(mouseGridX, -mouseGridY) + vp.Focus;
+            var mouseGridX = (grid.X - grid.Y);
+            var mouseGridY = (grid.X + grid.Y);
+            return new VirtualMapCoordinate(mouseGridX, mouseGridY) + vp.Focus;
         }
     }
 }

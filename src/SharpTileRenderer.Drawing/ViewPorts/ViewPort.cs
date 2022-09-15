@@ -142,6 +142,7 @@ namespace SharpTileRenderer.Drawing.ViewPorts
                 if (value.Equals(focus)) return;
                 focus = value;
                 OnPropertyChanged();
+                Refresh();
             }
         }
 

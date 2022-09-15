@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using SharpTileRenderer.Drawing.ViewPorts;
 using SharpTileRenderer.TexturePack;
 using SharpTileRenderer.TexturePack.Operations;
 using System;
@@ -7,6 +8,11 @@ namespace SharpTileRenderer.Drawing.Monogame
 {
     public static class XnaExtensions
     {
+        public static ScreenPosition ToScreenPosition(this Point p)
+        {
+            return new ScreenPosition(p.X, p.Y);
+        } 
+        
         public static Rectangle Clip(this Rectangle rect1, Rectangle rect2)
         {
             Rectangle rectangle = new Rectangle(Math.Max(rect1.X, rect2.X), Math.Max(rect1.Y, rect2.Y), 0, 0);

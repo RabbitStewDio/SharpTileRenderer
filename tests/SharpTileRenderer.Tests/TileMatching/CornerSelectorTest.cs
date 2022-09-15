@@ -115,10 +115,14 @@ renderLayers:
             spriteMatcher.Match(input, 0, resultCollector).Should().BeTrue();
             resultCollector.Should()
                            .BeEquivalentTo(
-                               (SpriteTag.Create(sm.Prefix, input.TagData.ToString(), "_cell_u_A_B_B"), SpritePosition.Up, input.Position),
-                               (SpriteTag.Create(sm.Prefix, input.TagData.ToString(), "_cell_r_B_B_B"), SpritePosition.Right, input.Position),
-                               (SpriteTag.Create(sm.Prefix, input.TagData.ToString(), "_cell_d_B_A_B"), SpritePosition.Down, input.Position),
-                               (SpriteTag.Create(sm.Prefix, input.TagData.ToString(), "_cell_l_B_B_A"), SpritePosition.Left, input.Position)
+                               // Matches B.C -> class-B, class-B via default, class-B via default
+                               (SpriteTag.Create(sm.Prefix, input.TagData.ToString(), "_cell_u_B_B_B"), SpritePosition.Up, input.Position),
+                               // Matches CAB -> class-B via default, class-A, class-B
+                               (SpriteTag.Create(sm.Prefix, input.TagData.ToString(), "_cell_r_B_A_B"), SpritePosition.Right, input.Position),
+                               // Matches B.$ -> class-B, class-B via default, class-A
+                               (SpriteTag.Create(sm.Prefix, input.TagData.ToString(), "_cell_d_B_B_A"), SpritePosition.Down, input.Position),
+                                // Matches $.B -> clsas-A, class-B via default, class-B
+                               (SpriteTag.Create(sm.Prefix, input.TagData.ToString(), "_cell_l_A_B_B"), SpritePosition.Left, input.Position)
                            );
         }
 

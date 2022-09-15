@@ -8,19 +8,16 @@ using System.Diagnostics;
 
 namespace SharpTileRenderer.Drawing.ViewPorts
 {
-    public class ScreenPositionMapping : IScreenPositionMapper
+    public class ScreenPositionMapping
     {
         static readonly ILogger logger = SLog.ForContext<ScreenPositionMapping>();
 
-        readonly GridType gridType;
         readonly ScreenPositionMapper mapper;
         IMapNavigator<GridDirection>? navigator;
         Optional<NavigatorMetaData> metaData;
-        Optional<MapArea> bounds;
 
         public ScreenPositionMapping(GridType gridType, IntDimension tileSize)
         {
-            this.gridType = gridType;
             this.mapper = new ScreenPositionMapper(gridType, tileSize);
         }
 
@@ -40,31 +37,19 @@ namespace SharpTileRenderer.Drawing.ViewPorts
             return navigator;
         }
 
-        public bool TryMapVirtual(VirtualMapCoordinate pos, out ScreenPosition sp)
+        public bool TryMapVirtual(IViewPort viewPort, VirtualMapCoordinate pos, out ScreenPosition sp)
         {
-            return mapper.TryMapVirtual(pos, out sp);
+            return mapper.TryMapVirtual(viewPort, pos, out sp);
         }
 
-        public bool TryMapPhysical(ContinuousMapCoordinate pos, List<ScreenPosition> results)
+        public bool TryMapPhysical(IViewPort viewPort, ContinuousMapCoordinate pos, List<ScreenPosition> results)
         {
-            return mapper.TryMapPhysical(pos, results);
+            return mapper.TryMapPhysical(viewPort, pos, results);
         }
 
         public void Refresh(IViewPort v)
         {
-            var centre = v.Focus;
-            var tileBounds = v.TileBounds;
-            var queryArea = new MapArea(centre.Normalize(),
-                                        (int)Math.Ceiling(tileBounds.Width / 2),
-                                        (int)Math.Ceiling(tileBounds.Height / 2));
-            if (bounds.TryGetValue(out var cachedBounds) && cachedBounds == queryArea)
-            {
-                return;
-            }
-
-            bounds = queryArea;
             mapper.Clear();
-
             switch (v.TileShape)
             {
                 case TileShape.Grid:
@@ -86,6 +71,29 @@ namespace SharpTileRenderer.Drawing.ViewPorts
 
         void ProcessGrid(IViewPort v)
         {
+            var normalizedNavigator = v.Navigation[MapNavigationType.Screen];
+            var mapNavigator = Fetch(normalizedNavigator.MetaData);
+
+            // represents the rendered tile area
+            var activeBounds = v.PixelBounds + v.PixelOverdraw + new ScreenInsets(v.TileSize.Height * 2, v.TileSize.Width * 2);
+            // represents the focus point, the map position directly under the center of the active bounds area
+            var focusPointScreen = v.PixelBounds.Center;
+            var centerRaw = v.ScreenSpaceNavigator.TranslateViewToWorld(v, focusPointScreen).VirtualCoordinate;
+            
+            var tilesToBoundsOriginPx = (focusPointScreen - activeBounds.TopLeft);
+            var tilesToBoundsOrigin = (x: (int)Math.Ceiling(tilesToBoundsOriginPx.X / v.TileSize.Width),
+                                       y: (int)Math.Ceiling(tilesToBoundsOriginPx.Y / v.TileSize.Height));
+
+            mapNavigator.NavigateTo(GridDirection.North, centerRaw.Normalize(), out var origin, tilesToBoundsOrigin.y);
+            mapNavigator.NavigateTo(GridDirection.West, origin, out origin, tilesToBoundsOrigin.x);
+
+            var tileOffset = centerRaw.InTilePosition();
+            var screenPos = new ScreenPosition(focusPointScreen.X - tilesToBoundsOrigin.x * v.TileSize.Width - tileOffset.X * v.TileSize.Width, 
+                                               focusPointScreen.Y - tilesToBoundsOrigin.y * v.TileSize.Height - tileOffset.Y * v.TileSize.Height);
+
+            var tileSize = v.TileSize;
+            var tileBounds = activeBounds / tileSize;
+/*
             var activeArea = v.PixelBounds + v.PixelOverdraw;
             var screenPos = new ScreenPosition(activeArea.X, activeArea.Y);
             var viewToWorld = v.ScreenSpaceNavigator.TranslateViewToWorld(v, screenPos);
@@ -94,7 +102,7 @@ namespace SharpTileRenderer.Drawing.ViewPorts
             var tileBounds = activeArea / tileSize;
             var mapNavigator = v.Navigation[MapNavigationType.Map];
             var mapNav = Fetch(mapNavigator.MetaData);
-
+*/
 
             for (int stepY = 0; stepY < tileBounds.Height; stepY += 1)
             {
@@ -102,14 +110,14 @@ namespace SharpTileRenderer.Drawing.ViewPorts
                 var lineOriginScreen = screenPos;
                 for (int stepX = 0; stepX < tileBounds.Width; stepX += 1)
                 {
-                    if (mapNavigator.NavigateTo(GridDirection.None, lineOrigin, out var mc, 0))
+                    if (normalizedNavigator.NavigateTo(GridDirection.None, lineOrigin, out var mc, 0))
                     {
                         mapper.AddPhysical(mc, lineOriginScreen);
                     }
 
                     mapper.AddVirtual(lineOrigin, lineOriginScreen);
 
-                    if (!mapNav.NavigateTo(GridDirection.East, lineOrigin, out lineOrigin))
+                    if (!mapNavigator.NavigateTo(GridDirection.East, lineOrigin, out lineOrigin))
                     {
                         break;
                     }
@@ -117,7 +125,7 @@ namespace SharpTileRenderer.Drawing.ViewPorts
                     lineOriginScreen = new ScreenPosition(lineOriginScreen.X + tileSize.Width, lineOriginScreen.Y);
                 }
 
-                if (!mapNav.NavigateTo(GridDirection.South, origin, out origin))
+                if (!mapNavigator.NavigateTo(GridDirection.South, origin, out origin))
                 {
                     break;
                 }
@@ -131,26 +139,27 @@ namespace SharpTileRenderer.Drawing.ViewPorts
             var normalizedNavigator = v.Navigation[MapNavigationType.Screen];
             var mapNavigator = Fetch(normalizedNavigator.MetaData);
 
-
             // represents the rendered tile area
-            var activeBounds = v.PixelBounds + v.PixelOverdraw + new ScreenInsets(v.TileSize.Height, v.TileSize.Width);
+            var activeBounds = v.PixelBounds + v.PixelOverdraw + new ScreenInsets(v.TileSize.Height * 2, v.TileSize.Width * 2);
             // represents the focus point, the map position directly under the center of the active bounds area
             var focusPointScreen = v.PixelBounds.Center;
             var centerRaw = v.ScreenSpaceNavigator.TranslateViewToWorld(v, focusPointScreen).VirtualCoordinate;
+            
             var tilesToBoundsOriginPx = (focusPointScreen - activeBounds.TopLeft);
-            var tilesToBoundsOrigin = ((int)Math.Ceiling(tilesToBoundsOriginPx.X / v.TileSize.Width),
-                                       (int)Math.Ceiling(tilesToBoundsOriginPx.Y / v.TileSize.Height));
+            var tilesToBoundsOrigin = (x: (int)Math.Ceiling(tilesToBoundsOriginPx.X / v.TileSize.Width),
+                                       y: (int)Math.Ceiling(tilesToBoundsOriginPx.Y / v.TileSize.Height));
 
-            mapNavigator.NavigateTo(GridDirection.North, centerRaw.Normalize(), out var origin, tilesToBoundsOrigin.Item2);
-            mapNavigator.NavigateTo(GridDirection.West, origin, out origin, tilesToBoundsOrigin.Item1);
+            mapNavigator.NavigateTo(GridDirection.North, centerRaw.Normalize(), out var origin, tilesToBoundsOrigin.y);
+            mapNavigator.NavigateTo(GridDirection.West, origin, out origin, tilesToBoundsOrigin.x);
 
-            var screenPos = new ScreenPosition(focusPointScreen.X - tilesToBoundsOrigin.Item1 * v.TileSize.Width, 
-                                               focusPointScreen.Y - tilesToBoundsOrigin.Item2 * v.TileSize.Height);
+            var tileOffset = centerRaw.InTilePosition();
+            var x = ScreenPositionMapper.ComputeIsoMapToScreenOffset(tileOffset.X, tileOffset.Y);
+            var screenPos = new ScreenPosition(focusPointScreen.X - tilesToBoundsOrigin.x * v.TileSize.Width - x.x * v.TileSize.Width, 
+                                               focusPointScreen.Y - tilesToBoundsOrigin.y * v.TileSize.Height - x.y * v.TileSize.Height);
 
             var tileSize = v.TileSize;
             var tileBounds = activeBounds / tileSize;
-
-
+            
             logger.Debug("== Using navigator {Navigator} with origin {Origin}", normalizedNavigator.MetaData, origin);
 
             for (int stepY = 0; stepY < tileBounds.Height * 2; stepY += 1)

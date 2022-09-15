@@ -31,10 +31,23 @@ namespace SharpTileRenderer.Tests.Drawing
             viewPort.PixelBounds = new ScreenBounds(0, 0, 320, 240);
             var snav = viewPort.ScreenSpaceNavigator;
 
-            converter.ScreenToMap(viewPort, new ScreenPosition(0, 0)).Should().Be(new VirtualMapCoordinate(-8.75f, 1.25f));
+            converter.ScreenToMap(viewPort, viewPort.PixelBounds.Center).Should().Be(new VirtualMapCoordinate(0, 0));
+            converter.ScreenToMap(viewPort, new ScreenPosition(0, 0)).Should().Be(new VirtualMapCoordinate(-1.25f, -8.75f));
             snav.TranslateViewToWorld(viewPort, new ScreenPosition(0, 0))
                 .Should()
-                .Be(new WorldPosition(new ContinuousMapCoordinate(-8.75f, 1.25f), new VirtualMapCoordinate(-8.75f, 1.25f), new NavigationInfo()));
+                .Be(new WorldPosition(new ContinuousMapCoordinate(-1.25f, -8.75f), new VirtualMapCoordinate(-1.25f, -8.75f), new NavigationInfo()));
+        }
+
+        [Test]
+        public void TestScreenMapping_Iso()
+        {
+            var viewPort = new ViewPort(NavigatorMetaData.FromGridType(GridType.IsoDiamond), TileShape.Isometric, new IntDimension(32, 32));
+            viewPort.PixelBounds = new ScreenBounds(0, 0, 320, 240);
+
+            var converter = ScreenToMapConverter.Create(GridType.IsoDiamond);
+            converter.ScreenToMap(viewPort, viewPort.PixelBounds.Center).Should().Be(new VirtualMapCoordinate(0, 0));
+            converter.ScreenToMap(viewPort, viewPort.PixelBounds.Center + new ScreenPosition(0, viewPort.TileSize.Height)).Should().Be(new VirtualMapCoordinate(-1, 1));
+            converter.ScreenToMap(viewPort, viewPort.PixelBounds.Center + new ScreenPosition(viewPort.TileSize.Width, 0)).Should().Be(new VirtualMapCoordinate(+1, 1));
         }
     }
 }

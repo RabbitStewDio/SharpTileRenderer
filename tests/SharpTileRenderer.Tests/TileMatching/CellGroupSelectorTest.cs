@@ -68,7 +68,7 @@ namespace SharpTileRenderer.Tests.TileMatching
             var resultCollector = new List<(SpriteTag tag, SpritePosition spriteOffset, ContinuousMapCoordinate pos)>();
 
             spriteMatcher.Match(input, 0, resultCollector).Should().BeTrue();
-            resultCollector.Should().BeEquivalentTo((SpriteTag.Create(null, sm.Prefix, "_A_B_A_A"), SpritePosition.CellMap, input.Position));
+            resultCollector.Should().BeEquivalentTo((SpriteTag.Create(null, sm.Prefix, "_A_A_A_B"), SpritePosition.CellMap, input.Position));
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace SharpTileRenderer.Tests.TileMatching
             // This test encounters an unknown tile (tag-C) that does not define any matched classes.
             // This is an error in itself and will make matching fail unless there is a default match class
             // defined (which is not in this test)
-            var (_, spriteMatcher) = CreateSpriteMatcher();
+            var (_, spriteMatcher) = CreateSpriteMatcherWithoutDefault();
             var input = SpriteMatcherInput.From(GraphicTag.From("ignored"), new ContinuousMapCoordinate(5f, 4f));
             var resultCollector = new List<(SpriteTag tag, SpritePosition spriteOffset, ContinuousMapCoordinate pos)>();
 
@@ -93,7 +93,7 @@ namespace SharpTileRenderer.Tests.TileMatching
         {
             // Matches with tag-C at 6,5. This tag has none of the matching classes, and we do not define
             // a default match. So there will be no sprite produced here.
-            var (_, spriteMatcher) = CreateSpriteMatcher();
+            var (_, spriteMatcher) = CreateSpriteMatcherWithoutDefault();
             var input = SpriteMatcherInput.From(GraphicTag.From("ignored"), new ContinuousMapCoordinate(6f, 6f));
             var resultCollector = new List<(SpriteTag tag, SpritePosition spriteOffset, ContinuousMapCoordinate pos)>();
 
@@ -104,7 +104,7 @@ namespace SharpTileRenderer.Tests.TileMatching
         public void ValidateSelectorMatch_Edge()
         {
             // Matches into undefined cells. Should simply not throw an exception, it wont match anything either.
-            var (_, spriteMatcher) = CreateSpriteMatcher();
+            var (_, spriteMatcher) = CreateSpriteMatcherWithoutDefault();
             var input = SpriteMatcherInput.From(GraphicTag.From("ignored"), new ContinuousMapCoordinate(0f, 0f));
             var resultCollector = new List<(SpriteTag tag, SpritePosition spriteOffset, ContinuousMapCoordinate pos)>();
 
@@ -117,7 +117,24 @@ namespace SharpTileRenderer.Tests.TileMatching
             {
                 Matches = { "A-class", "B-class" },
                 Prefix = "t.prefix.",
-                ContextDataSet = "context-data"
+                ContextDataSet = "context-data",
+                DefaultClass = "A-class"
+            };
+
+            var factory = new MatcherFactory<EntityClassification16>();
+            factory.WithDefaultMatchers();
+
+            var spriteMatcher = factory.CreateTagMatcher(sm, MatchFactoryContextFixture?.FactoryContext ?? throw new NullReferenceException());
+            return (sm, spriteMatcher);
+        }
+
+        protected (CellGroupSelectorModel, ISpriteMatcher<GraphicTag>) CreateSpriteMatcherWithoutDefault()
+        {
+            var sm = new CellGroupSelectorModel()
+            {
+                Matches = { "A-class", "B-class" },
+                Prefix = "t.prefix.",
+                ContextDataSet = "context-data",
             };
 
             var factory = new MatcherFactory<EntityClassification16>();
@@ -136,6 +153,7 @@ namespace SharpTileRenderer.Tests.TileMatching
       <ts:cell-group>
         <ts:prefix>t.prefix.</ts:prefix>
         <ts:context-data-set>context-data</ts:context-data-set>
+        <ts:default-class>A-class</ts:default-class>
         <ts:matches>
           <ts:class>A-class</ts:class>
           <ts:class>B-class</ts:class>
@@ -157,6 +175,7 @@ renderLayers:
       matches:
         - A-class
         - B-class
+      defaultClass: A-class
       direction: Up
 ";
 

@@ -68,14 +68,14 @@ namespace SharpTileRenderer.Drawing.ViewPorts
 
         public bool TryMapInverse(IViewPort vp, VirtualMapCoordinate pos, out ScreenPosition result)
         {
-            return reverseMapper.TryMapVirtual(pos, out result);
+            return reverseMapper.TryMapVirtual(vp, pos, out result);
         }
 
         public List<ScreenPosition> MapInverse(IViewPort vp, ContinuousMapCoordinate pos, List<ScreenPosition>? result = null)
         {
             result ??= new List<ScreenPosition>(); 
             result.Clear();
-            reverseMapper.TryMapPhysical(pos, result);
+            reverseMapper.TryMapPhysical(vp, pos, result);
             return result;
         }
     }

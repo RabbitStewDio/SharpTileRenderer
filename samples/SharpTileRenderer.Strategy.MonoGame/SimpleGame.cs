@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using SharpTileRenderer.Drawing;
 using SharpTileRenderer.Drawing.Monogame;
 using SharpTileRenderer.Drawing.ViewPorts;
@@ -84,7 +83,9 @@ namespace SharpTileRenderer.Strategy.MonoGame
 
             renderComponent.ViewPort = new ViewPort(navConfig, texturePack.TileShape, texturePack.TileSize);
             renderComponent.SetLayers(layers);
-            renderComponent.ViewPort.Focus = new VirtualMapCoordinate(9, 7);
+//            renderComponent.ViewPort.Focus = new VirtualMapCoordinate(9, 7);
+
+            Components.Add(new GameUI(this, renderComponent));
         }
 
         protected override void Update(GameTime gameTime)
@@ -146,7 +147,7 @@ namespace SharpTileRenderer.Strategy.MonoGame
                     tagMap.Add(tag.Id);
                 }
             }
-            
+
             foreach (var terrainId in game.GameData.Rules.TerrainTypes)
             {
                 if (!game.GameData.Rules.TerrainTypes.TryGetValue(terrainId, out var terrain))
@@ -175,7 +176,7 @@ namespace SharpTileRenderer.Strategy.MonoGame
             tag = default;
             return false;
         }
-        
+
         public ITileDataSet<GraphicTag, Unit> CreateTerrainDataSet()
         {
             GraphicTag TerrainToGraphicTag(TerrainData f)
@@ -201,7 +202,7 @@ namespace SharpTileRenderer.Strategy.MonoGame
                 {
                     return GraphicTag.From("road.river");
                 }
-                
+
                 if (game.GameData.Rules.TerrainTypes.TryGetValue(f.TerrainIdx, out var terrain))
                 {
                     if (terrain.Class == TerrainClass.Water)

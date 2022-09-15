@@ -40,6 +40,7 @@ namespace SharpTileRenderer.RPG.MonoGame
                 SynchronizeWithVerticalRetrace = false
             };
 
+            IsMouseVisible = true;
             Window.AllowUserResizing = true;
             IsFixedTimeStep = false;
             frameRate = new FrameRateCalculator(this);
@@ -83,6 +84,8 @@ namespace SharpTileRenderer.RPG.MonoGame
             renderComponent.ViewPort = new ViewPort(navConfig, texturePack.TileShape, texturePack.TileSize);
             renderComponent.SetLayers(layers);
             renderComponent.ViewPort.Focus = new VirtualMapCoordinate(0, 2);
+            
+            Components.Add(new GameUI(this, renderComponent));
         }
 
         protected override void Update(GameTime gameTime)

@@ -1,4 +1,5 @@
 ﻿using SharpTileRenderer.Navigation;
+using SharpTileRenderer.TileMatching.Selectors.BuiltIn;
 using System;
 
 namespace SharpTileRenderer.TileMatching.Selectors
@@ -60,6 +61,15 @@ namespace SharpTileRenderer.TileMatching.Selectors
 
     public static class SpritePositionExtensions
     {
+        /// <summary>
+        ///    Applies an map position offset based on the given sprite position. See <see cref="CellGroupSpriteMatcher{TClass}"/> and
+        ///    <see cref="CornerSpriteMatcher{TClass}"/> for details.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="mapPos"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public static ContinuousMapCoordinate Apply(this SpritePosition pos, ContinuousMapCoordinate mapPos, GridType t)
         {
             switch (t)
@@ -83,11 +93,11 @@ namespace SharpTileRenderer.TileMatching.Selectors
                     return pos switch
                     {
                         SpritePosition.Whole => mapPos,
-                        SpritePosition.Up => new ContinuousMapCoordinate(mapPos.X, mapPos.Y - 0.25f),
-                        SpritePosition.Right => new ContinuousMapCoordinate(mapPos.X + 0.25f, mapPos.Y),
-                        SpritePosition.Down => new ContinuousMapCoordinate(mapPos.X, mapPos.Y + 0.25f),
-                        SpritePosition.Left => new ContinuousMapCoordinate(mapPos.X - 0.25f, mapPos.Y),
-                        SpritePosition.CellMap => new ContinuousMapCoordinate(mapPos.X, mapPos.Y - 0.5f),
+                        SpritePosition.Up => new ContinuousMapCoordinate(mapPos.X + 0.25f, mapPos.Y - 0.25f),
+                        SpritePosition.Right => new ContinuousMapCoordinate(mapPos.X + 0.25f, mapPos.Y + 0.25f),
+                        SpritePosition.Down => new ContinuousMapCoordinate(mapPos.X - 0.25f, mapPos.Y + 0.25f),
+                        SpritePosition.Left => new ContinuousMapCoordinate(mapPos.X - 0.25f, mapPos.Y - 0.25f),
+                        SpritePosition.CellMap => new ContinuousMapCoordinate(mapPos.X + 0.5f, mapPos.Y - 0.5f),
                         _ => throw new ArgumentOutOfRangeException(nameof(pos), pos, null)
                     };
                 }

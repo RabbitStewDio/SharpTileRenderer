@@ -20,7 +20,7 @@ namespace SharpTileRenderer.Drawing.ViewPorts
     ///    on the screen, but don't forget to normalize the map coordinate before using it on
     ///    the map itself. 
     /// </summary>
-    public class ScreenPositionMapper : IScreenPositionMapper
+    public class ScreenPositionMapper
     {
         readonly Dictionary<MapCoordinate, FreeListIndex> normalizedMapping;
         readonly Dictionary<MapCoordinate, ScreenPosition> virtualMapping;
@@ -56,10 +56,11 @@ namespace SharpTileRenderer.Drawing.ViewPorts
             virtualMapping[c] = p;
         }
 
-        public bool TryMapVirtual(VirtualMapCoordinate pos, out ScreenPosition sp)
+        public bool TryMapVirtual(IViewPort vp, VirtualMapCoordinate pos, out ScreenPosition sp)
         {
-
-            if (!virtualMapping.TryGetValue(pos.Normalize(), out sp))
+            var nav = vp.Navigation[MapNavigationType.Map];
+            var posNormalized = nav.NavigateUnconditionally(GridDirection.None, pos.Normalize());
+            if (!virtualMapping.TryGetValue(posNormalized, out sp))
             {
                 return false;
             }
@@ -67,29 +68,30 @@ namespace SharpTileRenderer.Drawing.ViewPorts
             var cell = pos.InTilePosition();
             var m = gridType switch
             {
-                GridType.Grid => new ContinuousMapCoordinate(cell.X, cell.Y),
-                GridType.IsoDiamond => ComputeIsoDiamond(cell.X, cell.Y),
-                GridType.IsoStaggered => ComputeIsoDiamond(cell.X, cell.Y),
+                GridType.Grid => (x: cell.X, y: cell.Y),
+                GridType.IsoDiamond => ComputeIsoMapToScreenOffset(cell.X, cell.Y),
+                GridType.IsoStaggered => ComputeIsoMapToScreenOffset(cell.X, cell.Y),
                 _ => throw new ArgumentException()
             };
 
-            sp = new ScreenPosition(sp.X + (m.X * tileSize.Width), 
-                                    sp.Y + (m.Y * tileSize.Height));
+            sp = new ScreenPosition(sp.X + (m.x * tileSize.Width), 
+                                    sp.Y + (m.y * tileSize.Height));
             return true;
         }
 
-        internal static ContinuousMapCoordinate ComputeIsoDiamond(float x, float y)
+        internal static (float x, float y) ComputeIsoMapToScreenOffset(float x, float y)
         {
             var screenX = (y + x) / 2;
             var screenY = (y - x) / 2;
-            return new ContinuousMapCoordinate(screenX, screenY);
+            return (screenX, screenY);
         }
         
-        public bool TryMapPhysical(ContinuousMapCoordinate pos, List<ScreenPosition> results)
+        public bool TryMapPhysical(IViewPort vp, ContinuousMapCoordinate pos, List<ScreenPosition> results)
         {
             results.Clear();
 
-            var normalized = pos.Normalize();
+            var nav = vp.Navigation[MapNavigationType.Map];
+            var normalized = nav.NavigateUnconditionally(GridDirection.None, pos.Normalize());
             var cell = pos.InTilePosition();
             if (!normalizedMapping.TryGetValue(normalized, out var idx))
             {
@@ -98,13 +100,13 @@ namespace SharpTileRenderer.Drawing.ViewPorts
 
             var mapped = gridType switch
             {
-                GridType.Grid => cell,
-                GridType.IsoDiamond => ComputeIsoDiamond(cell.X, cell.Y),
-                GridType.IsoStaggered => ComputeIsoDiamond(cell.X, cell.Y),
+                GridType.Grid => (x: cell.X, y: cell.Y),
+                GridType.IsoDiamond => ComputeIsoMapToScreenOffset(cell.X, cell.Y),
+                GridType.IsoStaggered => ComputeIsoMapToScreenOffset(cell.X, cell.Y),
                     _ => throw new ArgumentException()
             };
 
-            var m = new ContinuousMapCoordinate(mapped.X * tileSize.Width, mapped.Y * tileSize.Height);
+            var m = new ContinuousMapCoordinate(mapped.x * tileSize.Width, mapped.y * tileSize.Height);
             
             while (!idx.IsEmpty)
             {

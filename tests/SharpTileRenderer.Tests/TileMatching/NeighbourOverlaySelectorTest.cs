@@ -120,10 +120,10 @@ renderLayers:
             spriteMatcher.Match(input, 0, resultCollector).Should().BeTrue();
             resultCollector.Should()
                            .BeEquivalentTo(
-                               (SpriteTag.Create(sm.Prefix, "tag-A", ".n"), SpritePosition.Whole, input.Position),
-                               (SpriteTag.Create(sm.Prefix, "tag-A", ".se"), SpritePosition.Whole, input.Position),
-                               (SpriteTag.Create(sm.Prefix, "tag-A", ".s"), SpritePosition.Whole, input.Position),
-                               (SpriteTag.Create(sm.Prefix, "tag-A", ".w"), SpritePosition.Whole, input.Position)
+                               (SpriteTag.Create(sm.Prefix, "tag-A", "_n"), SpritePosition.Whole, input.Position),
+                               (SpriteTag.Create(sm.Prefix, "tag-A", "_se"), SpritePosition.Whole, input.Position),
+                               (SpriteTag.Create(sm.Prefix, "tag-A", "_s"), SpritePosition.Whole, input.Position),
+                               (SpriteTag.Create(sm.Prefix, "tag-A", "_w"), SpritePosition.Whole, input.Position)
                            );
         }
 

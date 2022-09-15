@@ -73,9 +73,10 @@ namespace SharpTileRenderer.Drawing.Layers
                             var pt = new ContinuousMapCoordinate(x, y).Normalize();
                             queryBuffer.Clear();
                             PrimaryDataSet.QueryPoint(pt, v.ZLayer, queryBuffer);
+                            var tileBufferCountOld = tileBuffer.Count;
                             TileResolver.ResolveTiles(v.ZLayer, queryBuffer, tileBuffer);
 
-                            if (tileBuffer.Count == 0 && queryBuffer.Count != 0)
+                            if (tileBuffer.Count == tileBufferCountOld && queryBuffer.Count != 0)
                             {
                                 if (!warnNoRenderer.TryGetValue(queryBuffer[0].TagData, out _))
                                 {
