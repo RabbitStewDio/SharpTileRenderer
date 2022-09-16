@@ -1,19 +1,20 @@
-﻿using SharpTileRenderer.TexturePack.Tiles;
+﻿using SharpTileRenderer.Drawing.Rendering;
+using SharpTileRenderer.TexturePack.Tiles;
 using SharpTileRenderer.TileMatching;
-using SharpTileRenderer.TileMatching.DataSets;
 using SharpTileRenderer.TileMatching.Model;
 using SharpTileRenderer.Util;
-using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SharpTileRenderer.Drawing
 {
-    public interface ITexturedTileRendererFeatureModule<TTexture> : IFeatureModule
+    public interface ITexturedTileRendererFeatureModule<TTexture> : IFeatureModule 
+        where TTexture : ITexture<TTexture>
     {
-        public bool CreateRendererForData<TEntity, TClassification>(ITileDataSetProducer<TEntity> dataSet,
-                                                                    Func<RenderLayerModel, ITileResolver<SpriteTag, TexturedTile<TTexture>>> ts,
-                                                                    Optional<string> feature,
-                                                                    [MaybeNullWhen(false)] out IRenderLayerProducer<TClassification> c)
+        public Optional<ITileResolver<SpriteTag, TexturedTile<TTexture>>> TileSet { get; }
+        
+        Optional<ITileRenderer<TEntity>> CreateRendererForData<TEntity, TClassification>(IRenderLayerProducerConfig<TClassification> layerProducer,
+                                                                                         TileMatcherModel model,
+                                                                                         RenderLayerModel layer,
+                                                                                         ITileResolver<SpriteTag, TexturedTile<TTexture>> tileSet)
             where TClassification : struct, IEntityClassification<TClassification>;
     }
 }

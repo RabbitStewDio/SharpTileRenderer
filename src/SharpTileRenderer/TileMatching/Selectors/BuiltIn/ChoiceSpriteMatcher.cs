@@ -14,6 +14,7 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
         public string MatcherType => BuiltInSelectors.Choice;
         public bool IsThreadSafe { get; }
         readonly Dictionary<GraphicTag, ISpriteMatcher<GraphicTag>> cachedLookup;
+        readonly ISpriteMatcher<GraphicTag>? fallback;
 
         public ChoiceSpriteMatcher(IReadOnlyList<(GraphicTag, ISpriteMatcher<GraphicTag>)> matchers)
         {
@@ -21,8 +22,15 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
             IsThreadSafe = true;
             foreach (var m in matchers)
             {
-                cachedLookup[m.Item1] = m.Item2;
                 IsThreadSafe &= m.Item2.IsThreadSafe;
+                if (m.Item1 == GraphicTag.Empty)
+                {
+                    fallback = m.Item2;
+                }
+                else
+                {
+                    cachedLookup[m.Item1] = m.Item2;
+                }
             }
         }
 
@@ -33,6 +41,10 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
                 return value.Match(q, z, resultCollector);
             }
 
+            if (fallback != null)
+            {
+                return fallback.Match(q, z, resultCollector);
+            }
             return false;
         }
 
@@ -59,6 +71,12 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
 
                     childMatchers.Add((new GraphicTag(gt), sm));
                 }
+
+                if (s.MatchedTags.Count == 0)
+                {
+                    // default matcher
+                    childMatchers.Add((GraphicTag.Empty, sm));
+                }
             }
 
             return new ChoiceSpriteMatcher(childMatchers);
@@ -74,6 +92,7 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
         public string MatcherType => BuiltInSelectors.Choice;
         public bool IsThreadSafe { get; }
         readonly Dictionary<GraphicTag, ISpriteMatcher<(GraphicTag, int)>> cachedLookup;
+        readonly ISpriteMatcher<(GraphicTag, int)>? fallback;
 
         public QuantifiedChoiceSpriteMatcher(IReadOnlyList<(GraphicTag, ISpriteMatcher<(GraphicTag, int)>)> matchers)
         {
@@ -81,8 +100,15 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
             IsThreadSafe = true;
             foreach (var m in matchers)
             {
-                cachedLookup[m.Item1] = m.Item2;
                 IsThreadSafe &= m.Item2.IsThreadSafe;
+                if (m.Item1 == GraphicTag.Empty)
+                {
+                    fallback = m.Item2;
+                }
+                else
+                {
+                    cachedLookup[m.Item1] = m.Item2;
+                }
             }
         }
 
@@ -93,6 +119,10 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
                 return value.Match(q, z, resultCollector);
             }
 
+            if (fallback != null)
+            {
+                return fallback.Match(q, z, resultCollector);
+            }
             return false;
         }
 
@@ -118,6 +148,12 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
                     }
 
                     childMatchers.Add((new GraphicTag(gt), sm));
+                }
+
+                if (s.MatchedTags.Count == 0)
+                {
+                    // default matcher
+                    childMatchers.Add((GraphicTag.Empty, sm));
                 }
             }
 

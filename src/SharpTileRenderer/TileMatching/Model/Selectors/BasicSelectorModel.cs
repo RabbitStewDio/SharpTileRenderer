@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
@@ -51,6 +52,9 @@ namespace SharpTileRenderer.TileMatching.Model.Selectors
                 OnPropertyChanged();
             }
         }
+
+        [IgnoreDataMember]
+        public IReadOnlyList<ISelectorModel> ChildSelectors => Array.Empty<ISelectorModel>();
 
         public bool Equals(ISelectorModel other)
         {

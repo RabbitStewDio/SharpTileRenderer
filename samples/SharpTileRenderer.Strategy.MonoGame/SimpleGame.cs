@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using SharpTileRenderer.Drawing;
 using SharpTileRenderer.Drawing.Monogame;
 using SharpTileRenderer.Drawing.ViewPorts;
@@ -73,9 +74,9 @@ namespace SharpTileRenderer.Strategy.MonoGame
             var layers = RenderLayerFactory.DefineFactoryForMap(navConfig)
                                            .WithClassification<EntityClassification32>()
                                            .WithDefaultMatchers()
-                                           //.WithFeature(XnaTextureTileModule.For(Graphics).WithTileSet(tileSet).WithDebugRenderer(Content.Load<SpriteFont>("Fonts/DialogTiny")))
-                                           .WithFeature(XnaTextureTileModule.For(Graphics).WithTileSet(tileSet))
-                                           .WithFeature(new TextureBlendingTileModule())
+                                           .WithFeature(XnaRendererFeatureModule.For(Graphics).WithTileSet(tileSet))
+                                           .WithFeature(TextureBlendingTileModule.For(new XnaTextureOperations(Graphics)).WithTileSet(tileSet))
+                                           //.WithFeature(new XnaDebugRendererFeatureModule(Content.Load<SpriteFont>("Fonts/DialogTiny")))
                                            .PrepareForData()
                                            .WithDataSets(CreateDataSetHandler(renderConfig))
                                            .WithDataSets(CreateSettlementDataSet(renderConfig))
@@ -83,7 +84,7 @@ namespace SharpTileRenderer.Strategy.MonoGame
 
             renderComponent.ViewPort = new ViewPort(navConfig, texturePack.TileShape, texturePack.TileSize);
             renderComponent.SetLayers(layers);
-//            renderComponent.ViewPort.Focus = new VirtualMapCoordinate(9, 7);
+            renderComponent.ViewPort.Focus = new  VirtualMapCoordinate(2.4166665f, -0.9166666f);
 
             Components.Add(new GameUI(this, renderComponent));
         }

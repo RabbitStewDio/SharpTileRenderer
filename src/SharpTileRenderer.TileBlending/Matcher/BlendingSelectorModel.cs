@@ -2,6 +2,7 @@
 using SharpTileRenderer.TileMatching.Model;
 using SharpTileRenderer.TileMatching.Model.Selectors;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -23,11 +24,16 @@ namespace SharpTileRenderer.TileBlending.Matcher
         string? prefix;
 
         [DataMember(Order = 2)]
+        string? sourcePrefix;
+
+        [DataMember(Order = 3)]
+        string? sourceSuffix;
+
+        [DataMember(Order = 4)]
         string? contextDataSet;
 
         [IgnoreDataMember]
         public bool IsQuantifiedSelector => false;
-
 
         public BlendingSelectorModel()
         {
@@ -35,6 +41,33 @@ namespace SharpTileRenderer.TileBlending.Matcher
             MatchWith = new ObservableCollection<string>();
             RegisterObservableList(nameof(MatchSelf), MatchSelf);
             RegisterObservableList(nameof(MatchWith), MatchWith);
+        }
+
+        [IgnoreDataMember]
+        public IReadOnlyList<ISelectorModel> ChildSelectors => Array.Empty<ISelectorModel>();
+
+        [IgnoreDataMember]
+        public string? SourcePrefix
+        {
+            get { return sourcePrefix; }
+            set
+            {
+                if (value == sourcePrefix) return;
+                sourcePrefix = value;
+                OnPropertyChanged();
+            }
+        }
+
+        [IgnoreDataMember]
+        public string? SourceSuffix
+        {
+            get { return sourceSuffix; }
+            set
+            {
+                if (value == sourceSuffix) return;
+                sourceSuffix = value;
+                OnPropertyChanged();
+            }
         }
 
         [IgnoreDataMember]
@@ -67,10 +100,10 @@ namespace SharpTileRenderer.TileBlending.Matcher
             }
         }
 
-        [DataMember(Order = 3)]
+        [DataMember(Order = 5)]
         public ObservableCollection<string> MatchSelf { get; }
 
-        [DataMember(Order = 4)]
+        [DataMember(Order = 6)]
         public ObservableCollection<string> MatchWith { get; }
 
         public bool Equals(ISelectorModel? other)

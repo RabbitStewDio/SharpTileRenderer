@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Microsoft.Extensions.ObjectPool;
+using Serilog;
 using Serilog.Events;
 using SharpTileRenderer.Drawing.Queries;
 using SharpTileRenderer.Drawing.Rendering;
@@ -7,6 +8,8 @@ using SharpTileRenderer.Drawing.ViewPorts;
 using SharpTileRenderer.Navigation;
 using SharpTileRenderer.TileMatching.DataSets;
 using SharpTileRenderer.TileMatching.Model.EntitySources;
+using SharpTileRenderer.Util;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,8 +19,8 @@ namespace SharpTileRenderer.Drawing.Layers
     public class GridLayer<TQueryData, TEntity> : LayerBase<TQueryData, TEntity>
     {
         static readonly ILogger logger = SLog.ForContext<GridLayer<TQueryData, TEntity>>();
-        readonly List<RenderInstruction<TEntity>> tileBuffer;
-        readonly Dictionary<TQueryData, bool> warnNoRenderer;
+        readonly ObjectPool<List<RenderInstruction<TEntity>>> tileBufferPool;
+        readonly ConcurrentDictionary<TQueryData, bool> warnNoRenderer;
 
         public GridLayer(string name,
                          ILayerTileResolver<TQueryData, TEntity> tileResolver,
@@ -25,8 +28,8 @@ namespace SharpTileRenderer.Drawing.Layers
                          RenderingSortOrder renderSortOrder,
                          ITileRenderer<TEntity> renderer) : base(name, tileResolver, primaryDataSet, renderSortOrder, renderer)
         {
-            tileBuffer = new List<RenderInstruction<TEntity>>();
-            warnNoRenderer = new Dictionary<TQueryData, bool>();
+            tileBufferPool = new DefaultObjectPool<List<RenderInstruction<TEntity>>>(new ListObjectPolicy<RenderInstruction<TEntity>>());
+            warnNoRenderer = new ConcurrentDictionary<TQueryData, bool>();
         }
 
         /// <summary>
@@ -42,6 +45,7 @@ namespace SharpTileRenderer.Drawing.Layers
                                                            CancellationToken cancellationToken)
         {
             var queryBuffer = QueryBufferPool.Get();
+            var tileBuffer = tileBufferPool.Get();
             try
             {
                 var qp = p.ToGridArea();
@@ -51,6 +55,7 @@ namespace SharpTileRenderer.Drawing.Layers
             }
             finally
             {
+                tileBufferPool.Return(tileBuffer);
                 QueryBufferPool.Return(queryBuffer);
             }
         }
@@ -58,6 +63,7 @@ namespace SharpTileRenderer.Drawing.Layers
         protected override void PrepareRendering(IViewPort v, QueryPlan queryPlan, List<ScreenRenderInstruction<TEntity>> resultBuffer)
         {
             var queryBuffer = QueryBufferPool.Get();
+            var tileBuffer = tileBufferPool.Get();
             try
             {
                 tileBuffer.Clear();
@@ -97,6 +103,7 @@ namespace SharpTileRenderer.Drawing.Layers
             }
             finally
             {
+                tileBufferPool.Return(tileBuffer);
                 QueryBufferPool.Return(queryBuffer);
             }
         }

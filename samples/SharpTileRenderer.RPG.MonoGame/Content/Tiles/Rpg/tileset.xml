@@ -156,7 +156,7 @@
         </grid>
     </collection>
     <collection id="dg_people32">
-        <grid name="Default" x="0" y="0" cell-width="32" cell-height="32" anchor-x="16" anchor-y="24">
+        <grid name="Default" x="0" y="0" cell-width="32" cell-height="32" anchor-x="16" anchor-y="29">
             <tile x="0" y="0">
                 <tag>character.player</tag>
             </tile>

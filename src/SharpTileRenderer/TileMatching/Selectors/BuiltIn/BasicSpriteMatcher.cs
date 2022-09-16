@@ -11,18 +11,20 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
         public string? Prefix { get; }
         public string? Suffix { get; }
         public bool IsThreadSafe => true;
+        readonly SpriteTag preparedTag;
 
         public BasicSpriteMatcher(string? prefix, string? suffix)
         {
             Prefix = SpriteTag.Normalize(prefix);
             Suffix = SpriteTag.Normalize(suffix);
+            preparedTag = SpriteTag.Create(prefix, null, suffix);
         }
 
         public bool Match(in SpriteMatcherInput<GraphicTag> q, int z, List<(SpriteTag tag, SpritePosition spriteOffset, ContinuousMapCoordinate pos)> resultCollector)
         {
             if (q.TagData != GraphicTag.Empty)
             {
-                var spriteTag = q.TagData.AsSpriteTag();
+                var spriteTag = preparedTag.With(q.TagData);
                 resultCollector.Add((spriteTag.WithPrefix(Prefix).WithQualifier(Suffix), SpritePosition.Whole, q.Position));
                 return true;
             }

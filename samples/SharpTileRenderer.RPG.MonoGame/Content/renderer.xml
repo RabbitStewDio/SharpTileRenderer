@@ -53,6 +53,11 @@
                             <ts:graphic-tag>structure.stairs</ts:graphic-tag>
                         </ts:choice-matches>
                     </ts:choice-selection>
+                    <ts:choice-selection>
+                        <ts:basic>
+                            <ts:prefix>item.</ts:prefix>
+                        </ts:basic>
+                    </ts:choice-selection>
                 </ts:choice>
             </sub-layer>
             <sub-layer>

@@ -94,6 +94,19 @@ namespace SharpTileRenderer.Tests.Drawing
         }
 
         [Test]
+        public void ValidateScreenMapping_MathPrecision()
+        {
+            var vp = new ViewPort(NavigatorMetaData.FromGridType(GridType.IsoDiamond), TileShape.Isometric, new IntDimension(32, 16));
+            vp.PixelBounds = new ScreenBounds(0, 0, 320, 240);
+            vp.Focus = new  VirtualMapCoordinate(2.4166665f, -0.9166666f);
+            
+            var origin = vp.ScreenSpaceNavigator.TranslateViewToWorld(vp, new ScreenPosition(160, 120)).VirtualCoordinate;
+            origin.Should().Be(vp.Focus);
+
+            vp.ScreenSpaceNavigator.MapInverse(vp, new ContinuousMapCoordinate(vp.Focus.X, vp.Focus.Y)).Should().BeEquivalentTo(new ScreenPosition(160, 120));
+        }
+
+        [Test]
         public void ValidateScreenMapping_Offset_Repeat()
         {
             var vp = new ViewPort(NavigatorMetaData.FromGridType(GridType.IsoDiamond), TileShape.Isometric, new IntDimension(32, 16));

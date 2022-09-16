@@ -61,16 +61,16 @@ namespace SharpTileRenderer.Drawing
 
         public Optional<string> FeatureFlag { get; }
 
-        protected virtual ITileRenderer<(TEntity, int)> CreateQuantifiedRenderer(RenderLayerModel layer, IRenderLayerProducerData<TClassification> parameters)
+        protected virtual ITileRenderer<(TEntity, int)> CreateQuantifiedRenderer(RenderLayerModel layer, IRenderLayerProducerConfig<TClassification> parameters)
         {
             return new StripQuantityTileRenderer<TEntity, int>(CreateRenderer(layer, parameters));
         }
         
-        protected abstract ITileRenderer<TEntity> CreateRenderer(RenderLayerModel layer, IRenderLayerProducerData<TClassification> parameters);
+        protected abstract ITileRenderer<TEntity> CreateRenderer(RenderLayerModel layer, IRenderLayerProducerConfig<TClassification> parameters);
 
         public ILayer Create(TileMatcherModel tileMatcherModel,
                              RenderLayerModel layer,
-                             IRenderLayerProducerData<TClassification> parameters)
+                             IRenderLayerProducerConfig<TClassification> parameters)
         {
             if (layer.IsQuantifiedLayer())
             {
@@ -82,7 +82,7 @@ namespace SharpTileRenderer.Drawing
 
         protected ILayer<TEntity> CreateInternal(TileMatcherModel tileMatcherModel,
                                                  RenderLayerModel layer,
-                                                 IRenderLayerProducerData<TClassification> parameters)
+                                                 IRenderLayerProducerConfig<TClassification> parameters)
         {
             if (layer.SubLayers.Count > 0)
             {
@@ -113,7 +113,7 @@ namespace SharpTileRenderer.Drawing
 
         protected ILayer<(TEntity, int)> CreateInternalQuantified(TileMatcherModel tileMatcherModel,
                                                                   RenderLayerModel layer,
-                                                                  IRenderLayerProducerData<TClassification> parameters)
+                                                                  IRenderLayerProducerConfig<TClassification> parameters)
         {
             if (layer.SubLayers.Count > 0)
             {

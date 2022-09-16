@@ -36,10 +36,10 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
 
         readonly IMapNavigator<GridDirection> navigator;
         readonly ITileDataSet<GraphicTag, Unit> dataSet;
-        readonly string? prefix;
         readonly string[] tiles;
         readonly SelectorDefinition[] selectors;
         readonly MatchStrategy matcher;
+        readonly SpriteTag[] preparedSpriteTags;
 
         public string MatcherType => BuiltInSelectors.Corner;
         public bool IsThreadSafe => dataSet.MetaData.IsThreadSafe;
@@ -54,7 +54,6 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
         {
             this.navigator = navigator ?? throw new ArgumentNullException(nameof(navigator));
             this.dataSet = dataSet ?? throw new ArgumentNullException(nameof(dataSet));
-            this.prefix = prefix == null ? null : string.Intern(prefix);
 
             tagRegistry = tagRegistry ?? throw new ArgumentNullException(nameof(tagRegistry));
             classRegistry = classRegistry ?? throw new ArgumentNullException(nameof(classRegistry));
@@ -64,6 +63,11 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
             this.matcher = new MatchStrategy(dataSet, graphicTagToClassMapping, tileTagEntrySelections);
 
             this.selectors = PrepareSelectors();
+            this.preparedSpriteTags = new SpriteTag[tiles.Length];
+            for (var index = 0; index < tiles.Length; index++)
+            {
+                preparedSpriteTags[index] = SpriteTag.Create(prefix, null, tiles[index]);
+            }
         }
 
         string[] PrepareResultMappings(TileTagEntrySelectionFactory<TClass> owner)
@@ -109,7 +113,8 @@ namespace SharpTileRenderer.TileMatching.Selectors.BuiltIn
                         matcher.TryMatch(buffer[selector.SelectorCoordinates[2]], z, out var d))
                     {
                         var linearIndex = CellGroupSelectorKey.LinearIndexOf(selectorKey, b, c, d);
-                        var tile = SpriteTag.Create(prefix, q.TagData.Id, tiles[linearIndex]);
+                        var tile = preparedSpriteTags[linearIndex].With(q.TagData);
+                        // var tile = SpriteTag.Create(prefix, q.TagData.Id, tiles[linearIndex]);
                         resultCollector.Add((tile, selector.SpritePosition, q.Position));
                         result = true;
                     }

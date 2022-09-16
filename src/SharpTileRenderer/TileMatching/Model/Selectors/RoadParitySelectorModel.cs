@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -32,6 +33,9 @@ namespace SharpTileRenderer.TileMatching.Model.Selectors
             RegisterObservableList(nameof(MatchWith), MatchWith);
         }
 
+        [IgnoreDataMember]
+        public IReadOnlyList<ISelectorModel> ChildSelectors => Array.Empty<ISelectorModel>();
+        
         public string? Prefix
         {
             get

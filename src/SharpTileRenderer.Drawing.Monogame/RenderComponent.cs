@@ -83,6 +83,7 @@ namespace SharpTileRenderer.Drawing.Monogame
             for (var index = 0; index < layers.Count; index++)
             {
                 var l = layers[index];
+                Console.WriteLine("Layer " + l.Name + " -> " + l.ThreadSafePreparation);
                 this.layers.Add(l);
             }
         }

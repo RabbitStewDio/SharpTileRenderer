@@ -24,11 +24,15 @@ namespace SharpTileRenderer.TileBlending.Xml
         static ISelectorModel ParseBlendingSelectorModel(XElement element, IXmlTileMatcherModelReaderContext context)
         {
             var prefix = (string?)element.Element(XmlTileSelectorModelTags.PrefixTag);
+            var sourcePrefix = (string?)element.Element(XmlTileSelectorModelTags.Ns + "source-prefix");
+            var sourceSuffix = (string?)element.Element(XmlTileSelectorModelTags.Ns + "source-suffix");
             var matchDataSet = (string?)element.Element(XmlTileSelectorModelTags.ContextDataSetTag) ?? throw new XmlParseException("Mandatory element 'match-data-set' is missing", element);
             var retval = new BlendingSelectorModel()
             {
                 Prefix = prefix,
                 ContextDataSet = matchDataSet,
+                SourcePrefix = sourcePrefix,
+                SourceSuffix = sourceSuffix
             };
             retval.MatchSelf.ParseStringList(element.Element(XmlTileSelectorModelTags.Ns + "match-self"));
             retval.MatchWith.ParseStringList(element.Element(XmlTileSelectorModelTags.Ns + "match-with"));
@@ -44,6 +48,8 @@ namespace SharpTileRenderer.TileBlending.Xml
 
             var element = new XElement(XmlTileSelectorModelTags.Ns + BlendingSelectorModel.SelectorName);
             element.AddStringElement(XmlTileSelectorModelTags.PrefixTag, m.Prefix);
+            element.AddStringElement(XmlTileSelectorModelTags.Ns + "source-prefix", m.SourcePrefix);
+            element.AddStringElement(XmlTileSelectorModelTags.Ns + "source-suffix", m.SourceSuffix);
             element.AddStringElement(XmlTileSelectorModelTags.ContextDataSetTag, m.ContextDataSet);
             element.Add(m.MatchSelf.AddStringList(XmlTileSelectorModelTags.Ns + "match-self", XmlTileSelectorModelTags.MatchClassTag));
             element.Add(m.MatchWith.AddStringList(XmlTileSelectorModelTags.Ns + "match-with", XmlTileSelectorModelTags.MatchClassTag));

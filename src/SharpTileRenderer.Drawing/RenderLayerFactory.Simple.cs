@@ -79,9 +79,9 @@ namespace SharpTileRenderer.Drawing
                 this.primaryQuery = primaryQuery;
             }
 
-            public ILayer<TEntity> Build(ITileDataSetProducer<TEntity> p,
-                                         ITileRenderer<(TEntity, int)> renderer,
-                                         int quantity = 1)
+            public ILayer<TEntity> BuildCounted(ITileDataSetProducer<TEntity> p,
+                                                ITileRenderer<(TEntity, int)> renderer,
+                                                int quantity = 1)
             {
                 return Build(p, new EnrichQuantityTileRenderer<TEntity, int>(renderer, quantity));
             }

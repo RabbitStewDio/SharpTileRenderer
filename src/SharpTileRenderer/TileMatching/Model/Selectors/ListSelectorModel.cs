@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -23,6 +24,24 @@ namespace SharpTileRenderer.TileMatching.Model.Selectors
             RegisterObservableList(nameof(Selectors), Selectors);
         }
         
+        [IgnoreDataMember]
+        public IReadOnlyList<ISelectorModel> ChildSelectors
+        {
+            get
+            {
+                var retval = new List<ISelectorModel>();
+                foreach (var x in Selectors)
+                {
+                    if (x != null)
+                    {
+                        retval.Add(x);
+                    }
+                }
+
+                return retval;
+            }
+        }
+
         public bool Equals(ISelectorModel other)
         {
             return other is ListSelectorModel m && Equals(m);

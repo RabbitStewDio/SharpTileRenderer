@@ -13,12 +13,15 @@ namespace SharpTileRenderer.TileBlending.Textures
         readonly ITextureOperations<TTexture, TColor> textureOperations;
         readonly IntDimension tileSize;
         readonly Dictionary<(SpriteTag, TextureQuadrantIndex), BoundedTextureData<TColor>> textureDataCache;
+        readonly ITextureAtlasBuilder<TTexture> textureAtlasBuilder;
 
-        public BlendTileGenerator(ITextureOperations<TTexture, TColor> textureOperations, IntDimension tileSize)
+        public BlendTileGenerator(ITextureOperations<TTexture, TColor> textureOperations, 
+                                  IntDimension tileSize)
         {
             this.textureOperations = textureOperations;
             this.tileSize = tileSize;
             this.textureDataCache = new Dictionary<(SpriteTag, TextureQuadrantIndex), BoundedTextureData<TColor>>();
+            this.textureAtlasBuilder = textureOperations.CreateAtlasBuilder();
         }
 
         bool TryExtractData(TexturedTile<TTexture> tile, TextureQuadrantIndex direction, [MaybeNullWhen(false)] out BoundedTextureData<TColor> t)
@@ -40,7 +43,10 @@ namespace SharpTileRenderer.TileBlending.Textures
             return true;
         }
 
-        public bool TryCreateBlendTile(TexturedTile<TTexture> baseTile, TexturedTile<TTexture> blendMask, TextureQuadrantIndex direction, out TexturedTile<TTexture> result)
+        public bool TryCreateBlendTile(TexturedTile<TTexture> baseTile, 
+                                       TexturedTile<TTexture> blendMask, 
+                                       TextureQuadrantIndex direction, 
+                                       out TexturedTile<TTexture> result)
         {
             if (!TryExtractData(baseTile, direction, out var data))
             {
@@ -62,7 +68,8 @@ namespace SharpTileRenderer.TileBlending.Textures
             var wrappedTexture = textureOperations.CreateTexture(textureName.ToString(), wrappedTextureSize);
             var resultTexture = textureOperations.ApplyTextureData(wrappedTexture, resultData, sourceArea.Origin);
 
-            result = new TexturedTile<TTexture>(textureName, resultTexture, blendMask.Anchor);
+            var atlasEntry = textureAtlasBuilder.Add(resultTexture);
+            result = new TexturedTile<TTexture>(textureName, atlasEntry, blendMask.Anchor);
             return true;
         }
     }

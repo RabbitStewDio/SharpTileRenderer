@@ -11,19 +11,22 @@ using System.Threading.Tasks;
 
 namespace SharpTileRenderer.Drawing.Monogame
 {
-    public class DebugRenderer<TEntity, TTile> : ITileRenderer<TEntity>
-        where TTile: ITexturedTile<XnaTexture>
+    public class DebugSpriteBatchTileRenderer<TEntity, TTile> : ITileRenderer<TEntity>
+        where TTile : ITexturedTile<XnaTexture>
     {
         readonly GraphicsDeviceManager graphicsDeviceManager;
         readonly RasterizerState enableScissorTest;
         readonly ITileResolver<SpriteTag, TTile> tileRepository;
         readonly SpriteFont font;
+        readonly ITileRenderer<TEntity>? parent;
         SpriteBatch? spriteBatch;
 
-        public DebugRenderer(GraphicsDeviceManager graphicsDeviceManager, 
-                             ITileResolver<SpriteTag, TTile> tileRepository,
-                             SpriteFont font)
+        public DebugSpriteBatchTileRenderer(ITileRenderer<TEntity>? parent, 
+                                            GraphicsDeviceManager graphicsDeviceManager,
+                                            ITileResolver<SpriteTag, TTile> tileRepository,
+                                            SpriteFont font)
         {
+            this.parent = parent;
             this.graphicsDeviceManager = graphicsDeviceManager ?? throw new ArgumentNullException(nameof(graphicsDeviceManager));
             this.tileRepository = tileRepository ?? throw new ArgumentNullException(nameof(tileRepository));
             this.font = font;
@@ -54,16 +57,19 @@ namespace SharpTileRenderer.Drawing.Monogame
 
         public ValueTask RenderBatchAsync(IViewPort vp, List<ScreenRenderInstruction<TEntity>> renderInstructionBuffer, CancellationToken cancellationToken)
         {
+            parent?.RenderBatch(vp, renderInstructionBuffer);
             RenderBatch(vp, renderInstructionBuffer);
             return new ValueTask(Task.CompletedTask);
         }
 
         public void RenderBatch(IViewPort vp, List<ScreenRenderInstruction<TEntity>> renderInstructionBuffer)
         {
+            parent?.RenderBatch(vp, renderInstructionBuffer);
+            
             var bounds = vp.PixelBounds;
             var sb = SpriteBatch;
             using var state = sb.GraphicsDevice.SaveState();
-            
+
             sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, null, enableScissorTest, null,
                      Matrix.CreateTranslation(bounds.X, bounds.Y, 0));
             sb.GraphicsDevice.ScissorRectangle = new Rectangle((int)bounds.X, (int)bounds.Y, (int)Math.Ceiling(bounds.Width), (int)Math.Ceiling(bounds.Height));
@@ -82,9 +88,10 @@ namespace SharpTileRenderer.Drawing.Monogame
                 {
                     tileRepository.TryFind(spriteTag, out _);
                 }
+
                 sb.DrawString(font, $"{ri.RenderInstruction.MapPosition.X},{ri.RenderInstruction.MapPosition.Y}", origin, tint);
             }
-            
+
             sb.End();
         }
     }

@@ -6,6 +6,7 @@ using SharpTileRenderer.RPG.Base;
 using SharpTileRenderer.RPG.Base.Map;
 using SharpTileRenderer.RPG.Base.Model;
 using SharpTileRenderer.RPG.Base.Util;
+using SharpTileRenderer.Strategy.MonoGame;
 using SharpTileRenderer.TexturePack;
 using SharpTileRenderer.TexturePack.Tiles;
 using SharpTileRenderer.TileBlending.Xml;
@@ -71,11 +72,11 @@ namespace SharpTileRenderer.RPG.MonoGame
                                                               .Load(contentLoader, ContentUri.MakeRelative("renderer.xml"));
             var navConfig = game.NavigatorConfig;
             var dataSets = new DungeonGameDataSets(game, renderConfig);
-            
+
             var layers = RenderLayerFactory.DefineFactoryForMap(navConfig)
                                            .WithClassification<EntityClassification32>()
                                            .WithDefaultMatchers()
-                                           .WithFeature(XnaTextureTileModule.For(Graphics).WithTileSet(tileSet))
+                                           .WithFeature(XnaRendererFeatureModule.For(Graphics).WithTileSet(tileSet))
                                            .PrepareForData()
                                            .WithDataSets(dataSets.CreateTerrainDataSet())
                                            .WithDataSets(dataSets.CreateItemDataSet())
@@ -84,7 +85,7 @@ namespace SharpTileRenderer.RPG.MonoGame
             renderComponent.ViewPort = new ViewPort(navConfig, texturePack.TileShape, texturePack.TileSize);
             renderComponent.SetLayers(layers);
             renderComponent.ViewPort.Focus = new VirtualMapCoordinate(0, 2);
-            
+
             Components.Add(new GameUI(this, renderComponent));
         }
 
@@ -99,7 +100,6 @@ namespace SharpTileRenderer.RPG.MonoGame
             Graphics.GraphicsDevice.Clear(Color.Black);
             base.Draw(gameTime);
         }
-
     }
 
     public class DungeonGameDataSets
@@ -135,8 +135,6 @@ namespace SharpTileRenderer.RPG.MonoGame
 
         ITileDataSet<GraphicTag, TerrainElement?> CreateTerrainDataSetInternal()
         {
-            
-            
             return new DefaultMapTileDataSet<TerrainElement, TerrainElement?>(game.GameData.Terrain, TerrainTagMapping, t => t);
         }
 
@@ -146,6 +144,7 @@ namespace SharpTileRenderer.RPG.MonoGame
             {
                 return v;
             }
+
             return default;
         }
 

@@ -2,7 +2,6 @@
 using SharpTileRenderer.Drawing.Rendering;
 using SharpTileRenderer.Navigation;
 using SharpTileRenderer.TileMatching;
-using SharpTileRenderer.TileMatching.DataSets;
 using SharpTileRenderer.TileMatching.Model;
 using SharpTileRenderer.TileMatching.Model.DataSets;
 using SharpTileRenderer.TileMatching.Model.EntitySources;
@@ -10,261 +9,20 @@ using SharpTileRenderer.TileMatching.Selectors;
 using SharpTileRenderer.Util;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SharpTileRenderer.Drawing
 {
-    public class RenderLayerFactoryPart<TClassification> : IFeatureInitializer<TClassification>
-        where TClassification : struct, IEntityClassification<TClassification>
-    {
-        public RenderLayerFactoryPart(NavigatorMetaData md, EntityClassificationRegistry<TClassification> registry)
-        {
-            this.features = new List<IFeatureModule>();
-            this.MapNavigator = md;
-            this.Registry = registry ?? throw new ArgumentNullException(nameof(registry));
-            this.TagMetaData = new GraphicTagMetaDataRegistry<TClassification>(registry);
-            this.MatcherFactory = new MatcherFactory<TClassification>();
-        }
-
-        readonly List<IFeatureModule> features;
-
-        public NavigatorMetaData MapNavigator { get; }
-
-        public EntityClassificationRegistry<TClassification> Registry { get; }
-
-        public GraphicTagMetaDataRegistry<TClassification> TagMetaData { get; }
-
-        public MatcherFactory<TClassification> MatcherFactory { get; }
-
-        public RenderLayerFactoryPart<TClassification> WithFeature(IFeatureModule f)
-        {
-            features.Add(f);
-            f.Initialize(this);
-            return this;
-        }
-
-        public RenderLayerFactoryPart<TClassification> WithDefaultMatchers()
-        {
-            this.MatcherFactory.WithDefaultMatchers();
-            return this;
-        }
-
-        public RenderLayerFactoryPart<TClassification> RegisterTagSelector(string id, MatcherFactory<TClassification>.MatcherFactoryDelegate<GraphicTag> f)
-        {
-            this.MatcherFactory.RegisterTagSelector(id, f);
-            return this;
-        }
-
-        public RenderLayerFactoryPart<TClassification> RegisterQuantifiedTagSelector(string id, MatcherFactory<TClassification>.MatcherFactoryDelegate<(GraphicTag, int)> f)
-        {
-            this.MatcherFactory.RegisterQuantifiedTagSelector(id, f);
-            return this;
-        }
-
-        public RenderLayerFactoryPart<TClassification> Register(Action<MatcherFactory<TClassification>> action)
-        {
-            action(MatcherFactory);
-            return this;
-        }
-
-        public RenderLayerProducerData<TClassification> PrepareForData()
-        {
-            return new RenderLayerProducerData<TClassification>(MapNavigator, Registry, TagMetaData, MatcherFactory, features.ToArray());
-        }
-    }
-
-    public class RenderLayerProducerData<TClassification> : IRenderLayerProducerData<TClassification>
-        where TClassification : struct, IEntityClassification<TClassification>
-    {
-        readonly IFeatureModule[] tileRendererFeatures;
-        readonly List<IRenderLayerProducer<TClassification>> dataContexts;
-        public NavigatorMetaData MapNavigator { get; }
-        public EntityClassificationRegistry<TClassification> Registry { get; }
-        public GraphicTagMetaDataRegistry<TClassification> TagMetaData { get; }
-        public MatcherFactory<TClassification> MatcherFactory { get; }
-
-        public RenderLayerProducerData(NavigatorMetaData md,
-                                       EntityClassificationRegistry<TClassification> registry,
-                                       GraphicTagMetaDataRegistry<TClassification> tagMetaData,
-                                       MatcherFactory<TClassification> matcherFactory,
-                                       IFeatureModule[] tileRendererFeatures)
-        {
-            this.tileRendererFeatures = tileRendererFeatures ?? throw new ArgumentNullException(nameof(tileRendererFeatures));
-            MapNavigator = md;
-            Registry = registry ?? throw new ArgumentNullException(nameof(registry));
-            TagMetaData = tagMetaData ?? throw new ArgumentNullException(nameof(tagMetaData));
-            MatcherFactory = matcherFactory ?? throw new ArgumentNullException(nameof(matcherFactory));
-            dataContexts = new List<IRenderLayerProducer<TClassification>>();
-        }
-
-        RenderLayerProducerData(NavigatorMetaData md,
-                                EntityClassificationRegistry<TClassification> registry,
-                                GraphicTagMetaDataRegistry<TClassification> tagMetaData,
-                                MatcherFactory<TClassification> matcherFactory,
-                                List<IRenderLayerProducer<TClassification>> dataContexts,
-                                IFeatureModule[] tileRendererFeatures)
-        {
-            this.dataContexts = dataContexts ?? throw new ArgumentNullException(nameof(dataContexts));
-            this.tileRendererFeatures = tileRendererFeatures ?? throw new ArgumentNullException(nameof(tileRendererFeatures));
-            MapNavigator = md;
-            Registry = registry ?? throw new ArgumentNullException(nameof(registry));
-            TagMetaData = tagMetaData ?? throw new ArgumentNullException(nameof(tagMetaData));
-            MatcherFactory = matcherFactory ?? throw new ArgumentNullException(nameof(matcherFactory));
-        }
-
-        public bool TryGetFeature<TFeature>([MaybeNullWhen(false)] out TFeature f)
-        {
-            foreach (var feat in tileRendererFeatures)
-            {
-                if (feat is TFeature maybeFeature)
-                {
-                    f = maybeFeature;
-                    return true;
-                }
-            }
-
-            f = default;
-            return false;
-        }
-
-        public RenderLayerProducerData<TClassification> WithDataSets<TEntity>(ITileDataSetProducer<TEntity> dataSets)
-        {
-            var dataContext = new List<IRenderLayerProducer<TClassification>>(this.dataContexts);
-            foreach (var feature in tileRendererFeatures)
-            {
-                if (feature is IDrawingFeatureModule drawingFeature)
-                {
-                    if (drawingFeature.CreateRendererForData(this, dataSets, out var lp))
-                    {
-                        dataContext.Add(lp);
-                    }
-                }
-            }
-
-            return new RenderLayerProducerData<TClassification>(MapNavigator, Registry, TagMetaData, MatcherFactory, dataContext, tileRendererFeatures);
-        }
-
-        public RenderLayerProducerData<TClassification> WithAvailableDataSets<TEntity>(ITileDataSetProducer<TEntity> dataSets,
-                                                                                       IRenderLayerProducer<TClassification> layerProducer)
-        {
-            var dataContext = new List<IRenderLayerProducer<TClassification>>(this.dataContexts);
-            dataContext.Add(layerProducer);
-            return new RenderLayerProducerData<TClassification>(MapNavigator, Registry, TagMetaData, MatcherFactory, dataContext, tileRendererFeatures);
-        }
-
-        public List<ILayer> ProduceLayers(TileMatcherModel renderConfig)
-        {
-            foreach (var tagDef in renderConfig.Tags)
-            {
-                if (string.IsNullOrEmpty(tagDef.Id)) continue;
-                TagMetaData.Register(tagDef);
-            }
-
-            return ProduceLayers(renderConfig, renderConfig.RenderLayers);
-        }
-
-        List<ILayer> ProduceLayers(TileMatcherModel renderConfig, IReadOnlyList<RenderLayerModel> layers)
-        {
-            var result = new List<ILayer>();
-            foreach (var renderLayer in renderConfig.RenderLayers)
-            {
-                if (!renderLayer.Enabled) continue;
-
-                var layer = ProduceLayer(renderConfig, renderLayer);
-                if (layer.TryGetValue(out var l))
-                {
-                    result.Add(l);
-                }
-            }
-
-            return result;
-        }
-
-
-        Optional<ILayer> ProduceLayer(TileMatcherModel renderConfig, RenderLayerModel renderLayer)
-        {
-            // First attempt to build feature-flag specific layers 
-            if (renderLayer.FeatureFlags.Count > 0)
-            {
-                foreach (var ds in dataContexts)
-                {
-                    if (!ds.HandlesLayer(renderLayer))
-                    {
-                        continue;
-                    }
-
-                    if (!ds.FeatureFlag.TryGetValue(out var ff))
-                    {
-                        continue;
-                    }
-
-                    if (renderLayer.FeatureFlags.Contains(ff))
-                    {
-                        ILayer l = ds.Create(renderConfig, renderLayer, this);
-                        return Optional.OfNullable(l);
-                    }
-                }
-
-                return Optional.Empty<ILayer>();
-            }
-
-            // .. and only if there are no feature-flag layers defined, build a generic layer 
-            foreach (var ds in dataContexts)
-            {
-                if (!ds.HandlesLayer(renderLayer))
-                {
-                    continue;
-                }
-
-                if (ds.FeatureFlag.TryGetValue(out _))
-                {
-                    continue;
-                }
-
-                ILayer l = ds.Create(renderConfig, renderLayer, this);
-                return Optional.OfNullable(l);
-            }
-
-            return Optional.Empty<ILayer>();
-        }
-    }
-
-    public interface IRenderLayerProducerData<TClassification>
-        where TClassification : struct, IEntityClassification<TClassification>
-    {
-        public NavigatorMetaData MapNavigator { get; }
-        public EntityClassificationRegistry<TClassification> Registry { get; }
-        public GraphicTagMetaDataRegistry<TClassification> TagMetaData { get; }
-        public MatcherFactory<TClassification> MatcherFactory { get; }
-    }
-
     public interface IRenderLayerProducer<TClassification>
         where TClassification : struct, IEntityClassification<TClassification>
     {
         bool HandlesLayer(RenderLayerModel layer);
         Optional<string> FeatureFlag { get; }
-        ILayer Create(TileMatcherModel tileMatcherModel, RenderLayerModel layer, IRenderLayerProducerData<TClassification> parameters);
-    }
-
-    public class RenderLayerFactoryPart
-    {
-        readonly NavigatorMetaData md;
-
-        public RenderLayerFactoryPart(NavigatorMetaData md)
-        {
-            this.md = md;
-        }
-
-        public RenderLayerFactoryPart<TClassification> WithClassification<TClassification>()
-            where TClassification : struct, IEntityClassification<TClassification>
-        {
-            return new RenderLayerFactoryPart<TClassification>(md, new EntityClassificationRegistry<TClassification>());
-        }
+        ILayer Create(TileMatcherModel tileMatcherModel, RenderLayerModel layer, IRenderLayerProducerConfig<TClassification> parameters);
     }
 
     public static partial class RenderLayerFactory
     {
-        public static RenderLayerFactoryPart DefineFactoryForMap(NavigatorMetaData md) => new RenderLayerFactoryPart(md);
+        public static RenderLayerFactoryWithNavigator DefineFactoryForMap(NavigatorMetaData md) => new RenderLayerFactoryWithNavigator(md);
 
         public static RenderFactoryData CreateLayer(string layerId)
         {
@@ -272,8 +30,8 @@ namespace SharpTileRenderer.Drawing
         }
 
         public static CombinedLayer<TEntityKey> CreateCombinedLayer<TEntityKey>(RenderLayerModel layerModel,
-                                                                                       ITileRenderer<TEntityKey> renderer,
-                                                                                       params ILayer<TEntityKey>[]? layers)
+                                                                                ITileRenderer<TEntityKey> renderer,
+                                                                                params ILayer<TEntityKey>[]? layers)
         {
             if (layerModel == null)
             {
@@ -296,7 +54,8 @@ namespace SharpTileRenderer.Drawing
                                                  layerModel.SortingOrder, renderer, layers);
         }
 
-        public static RenderFactoryData<TEntityKey> CreateLayer<TEntityKey>(RenderLayerModel layerModel, IReadOnlyList<IDataSetModel> models)
+        public static RenderFactoryData<TEntityKey> CreateLayer<TEntityKey>(RenderLayerModel layerModel, 
+                                                                            IReadOnlyList<IDataSetModel> models)
         {
             if (layerModel == null)
             {

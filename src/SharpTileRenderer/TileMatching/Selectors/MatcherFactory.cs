@@ -39,7 +39,7 @@ namespace SharpTileRenderer.TileMatching.Selectors
             {
                 return factory(model, this, context);
             }
-            throw new ArgumentException();
+            throw new ArgumentException($"Unable to create matcher for {model.Kind}");
         }
 
 

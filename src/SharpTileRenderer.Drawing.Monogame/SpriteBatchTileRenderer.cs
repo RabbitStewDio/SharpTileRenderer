@@ -95,7 +95,9 @@ namespace SharpTileRenderer.Drawing.Monogame
                     var textureBounds = texture.Bounds;
                     var anchor = tile.Anchor;
                     var tint = Color.White;
-                    sb.Draw(texture.Texture, new Vector2(renderPos.X - anchor.X, renderPos.Y - anchor.Y), textureBounds.ToXna(), tint);
+                    sb.Draw(texture.Texture, new Vector2((float)Math.Round(renderPos.X - anchor.X, 3, MidpointRounding.ToNegativeInfinity), 
+                                                         (float)Math.Round(renderPos.Y - anchor.Y, 3, MidpointRounding.ToNegativeInfinity)), 
+                            textureBounds.ToXna(), tint);
                 }
                 else if (!warnedItems.Contains(spriteTag))
                 {

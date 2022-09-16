@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -107,6 +108,24 @@ namespace SharpTileRenderer.TileMatching.Model.Selectors
         {
             Choices = new ObservableCollection<QuantitySelectorDefinition>();
             RegisterObservableList(nameof(Choices), Choices);
+        }
+
+        [IgnoreDataMember]
+        public IReadOnlyList<ISelectorModel> ChildSelectors
+        {
+            get
+            {
+                var retval = new List<ISelectorModel>();
+                foreach (var x in Choices)
+                {
+                    if (x.Selector != null)
+                    {
+                        retval.Add(x.Selector);
+                    }
+                }
+
+                return retval;
+            }
         }
 
         public bool Equals(ISelectorModel other)

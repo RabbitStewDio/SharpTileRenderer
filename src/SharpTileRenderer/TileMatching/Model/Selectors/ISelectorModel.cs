@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace SharpTileRenderer.TileMatching.Model.Selectors
@@ -7,5 +8,6 @@ namespace SharpTileRenderer.TileMatching.Model.Selectors
     {
         public string Kind { get; }
         public bool IsQuantifiedSelector { get; }
+        public IReadOnlyList<ISelectorModel> ChildSelectors { get; }
     }
 }

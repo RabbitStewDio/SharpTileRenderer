@@ -7,14 +7,27 @@ namespace SharpTileRenderer.TexturePack
 {
     public interface ITextureTileModule : IFeatureModule
     {
-        T WithTextureOperation<T>(ITileSetOperationFunc<T> t);
+        /// <summary>
+        ///   This is a generic parameter enriching interface. This trick allows
+        ///   the code to promote type information known in one part to be transferred
+        ///   to dependent parts without having to ever explicitly name the parameters
+        ///   when calling. 
+        /// 
+        ///   Calls the given operation with the current texture type parameter as
+        ///   the <see cref="ITileSetOperationFunc{T}.Apply{TTexture}"/> method's
+        ///   type parameter.  
+        /// </summary>
+        /// <param name="t"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+       // T LiftTexture<T>(ITileSetOperationFunc<T> t);
     }
 
     public interface ITexturedTileModule<TTexture> : ITextureTileModule
         where TTexture : ITexture<TTexture>
     {
         Optional<ITileResolver<SpriteTag, TexturedTile<TTexture>>> TileSet { get; }
-        T WithTextureOperation<T>(ITextureOperationFunc<T, TTexture> t);
+        // T LiftTextureColorOperation<T>(ITextureOperationFunc<T, TTexture> t);
     }
 
     public interface ITileSetOperationFunc<T>

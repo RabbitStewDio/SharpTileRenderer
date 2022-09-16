@@ -1,12 +1,13 @@
 ﻿using Microsoft.Extensions.ObjectPool;
 using SharpTileRenderer.Navigation;
+using SharpTileRenderer.TexturePack.Operations;
 using SharpTileRenderer.TileMatching;
 using SharpTileRenderer.TileMatching.DataSets;
 using SharpTileRenderer.TileMatching.Model.Selectors;
 using SharpTileRenderer.TileMatching.Selectors;
-using SharpTileRenderer.TileMatching.Selectors.BuiltIn;
 using SharpTileRenderer.Util;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 
 namespace SharpTileRenderer.TileBlending.Matcher
@@ -19,13 +20,12 @@ namespace SharpTileRenderer.TileBlending.Matcher
         readonly TEntityClass others;
         readonly IMapNavigator<GridDirection> navigator;
         readonly ITileDataSet<GraphicTag, Unit> dataSet;
-        readonly MapCoordinate[] navigationBuffer;
-        readonly CardinalIndex[] directions;
+        readonly TextureQuadrantIndex[] directions;
         readonly ObjectPool<List<SparseTagQueryResult<GraphicTag, Unit>>> queryPool;
         readonly string prefix;
 
         public string MatcherType => BlendingSelectorModel.SelectorName;
-        public bool IsThreadSafe => false;
+        public bool IsThreadSafe => dataSet.MetaData.IsThreadSafe;
 
         public BlendingSpriteMatcher(IMapNavigator<GridDirection> navigator,
                                      ITileDataSet<GraphicTag, Unit> dataSet,
@@ -41,8 +41,7 @@ namespace SharpTileRenderer.TileBlending.Matcher
             this.dataSet = dataSet ?? throw new ArgumentNullException(nameof(dataSet));
             this.prefix = string.IsNullOrEmpty(prefix) ? "t.blend." : prefix;
             this.queryPool = new DefaultObjectPool<List<SparseTagQueryResult<GraphicTag, Unit>>>(new ListObjectPolicy<SparseTagQueryResult<GraphicTag, Unit>>());
-            this.navigationBuffer = new MapCoordinate[4];
-            this.directions = new[] { CardinalIndex.North, CardinalIndex.East, CardinalIndex.South, CardinalIndex.West };
+            this.directions = new[] { TextureQuadrantIndex.North, TextureQuadrantIndex.East, TextureQuadrantIndex.South, TextureQuadrantIndex.West };
         }
 
         public bool Match(in SpriteMatcherInput<GraphicTag> q,
@@ -51,45 +50,53 @@ namespace SharpTileRenderer.TileBlending.Matcher
         {
             var selfClasses = tagMeta.QueryClasses(q.TagData);
             var blendSelf = selfClasses.MatchesAny(this.self);
-            navigator.NavigateCardinalNeighbours(q.Position.Normalize(), navigationBuffer);
-
-            for (var i = 0; i < navigationBuffer.Length; i++)
+            var navigationBuffer = ArrayPool<MapCoordinate>.Shared.Rent(4);
+            try
             {
-                var pos = navigationBuffer[i];
-                var dir = directions[i];
-                var queryResult = queryPool.Get();
-                try
-                {
-                    dataSet.QueryPoint(pos, z, queryResult);
-                    for (var qrIdx = 0; qrIdx < queryResult.Count; qrIdx++)
-                    {
-                        var qr = queryResult[qrIdx];
-                        var blend = tagMeta.QueryClasses(qr.TagData).MatchesAny(others);
-                        if (!blendSelf && !blend)
-                        {
-                            continue;
-                        }
+                navigator.NavigateCardinalNeighbours(q.Position.Normalize(), navigationBuffer);
 
-                        var spriteTag = qr.TagData.AsSpriteTag().WithPrefix(prefix).WithQualifier(BlendSuffixFor(dir));
-                        resultCollector.Add((spriteTag, SpritePosition.Whole, q.Position));
+                for (var i = 0; i < 4; i++)
+                {
+                    var pos = navigationBuffer[i];
+                    var dir = directions[i];
+                    var queryResult = queryPool.Get();
+                    try
+                    {
+                        dataSet.QueryPoint(pos, z, queryResult);
+                        for (var qrIdx = 0; qrIdx < queryResult.Count; qrIdx++)
+                        {
+                            var qr = queryResult[qrIdx];
+                            var blend = tagMeta.QueryClasses(qr.TagData).MatchesAny(others);
+                            if (!blendSelf && !blend)
+                            {
+                                continue;
+                            }
+
+                            var spriteTag = qr.TagData.AsSpriteTag().WithPrefix(prefix).WithQualifier(BlendSuffixFor(dir));
+                            resultCollector.Add((spriteTag, SpritePosition.Whole, q.Position));
+                        }
+                    }
+                    finally
+                    {
+                        queryResult.Clear();
+                        queryPool.Return(queryResult);
                     }
                 }
-                finally
-                {
-                    queryResult.Clear();
-                    queryPool.Return(queryResult);
-                }
+            }
+            finally
+            {
+                ArrayPool<MapCoordinate>.Shared.Return(navigationBuffer);
             }
 
             return true;
         }
 
-        string BlendSuffixFor(CardinalIndex idx) => idx switch
+        public static string BlendSuffixFor(TextureQuadrantIndex idx) => idx switch
         {
-            CardinalIndex.North => "_north",
-            CardinalIndex.East => "_east",
-            CardinalIndex.South => "_south",
-            CardinalIndex.West => "_west",
+            TextureQuadrantIndex.North => "_north",
+            TextureQuadrantIndex.East => "_east",
+            TextureQuadrantIndex.South => "_south",
+            TextureQuadrantIndex.West => "_west",
             _ => throw new ArgumentOutOfRangeException(nameof(idx), idx, null)
         };
 

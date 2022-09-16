@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using ScreenPosition = SharpTileRenderer.Drawing.ViewPorts.ScreenPosition;
 
 namespace SharpTileRenderer.Drawing.Layers
 {
@@ -20,7 +21,7 @@ namespace SharpTileRenderer.Drawing.Layers
         readonly ObjectPool<List<ScreenRenderInstruction<TEntity>>> pool;
         readonly List<ScreenRenderInstruction<TEntity>> renderInstructionBuffer;
         readonly List<(ConfiguredValueTaskAwaitable, List<ScreenRenderInstruction<TEntity>>)> taskBuffer;
-        readonly List<ScreenPosition> mappingResult;
+        readonly ObjectPool<List<ScreenPosition>> mappingResultPool;
         readonly RenderingSortOrder renderSortOrder;
         readonly ITileRenderer<TEntity> renderer;
         protected readonly ObjectPool<List<SparseTagQueryResult<TQueryData, TEntity>>> QueryBufferPool;
@@ -34,7 +35,7 @@ namespace SharpTileRenderer.Drawing.Layers
                          ITileRenderer<TEntity> renderer)
         {
             this.Name = name ?? throw new ArgumentNullException(nameof(name));
-            this.mappingResult = new List<ScreenPosition>();
+            this.mappingResultPool = new DefaultObjectPool<List<ScreenPosition>>(new ListObjectPolicy<ScreenPosition>());
             this.TileResolver = tileResolver ?? throw new ArgumentNullException(nameof(tileResolver));
             this.PrimaryDataSet = primaryDataSet ?? throw new ArgumentNullException(nameof(primaryDataSet));
             this.renderSortOrder = renderSortOrder;
@@ -84,21 +85,49 @@ namespace SharpTileRenderer.Drawing.Layers
         public void PrepareRenderLayer(IViewPort v, List<QueryPlan> p)
         {
             renderInstructionBuffer.Clear();
-            foreach (var queryPlan in p)
+
+            if (ThreadSafePreparation && p.Count > 1)
             {
-                var bufferList = pool.Get();
-                PrepareRendering(v, queryPlan, bufferList);
-                foreach (var l in bufferList)
+                (List<ScreenRenderInstruction<TEntity>> buffer, IViewPort vp) Init()
                 {
-                    renderInstructionBuffer.Add(l);
+                    var buffer = pool.Get();
+                    return (buffer, v);
                 }
 
-                pool.Return(bufferList);
+                Parallel.ForEach(p, Init, ProcessQueryPlanParallel, MergeResults);
+            }
+            else
+            {
+                foreach (var queryPlan in p)
+                {
+                    PrepareRendering(v, queryPlan, renderInstructionBuffer);
+                }
             }
 
             SortForScreenRenderPosition();
         }
 
+        void MergeResults((List<ScreenRenderInstruction<TEntity>> buffer, IViewPort vp) x)
+        {
+            lock (renderInstructionBuffer)
+            {
+                renderInstructionBuffer.Capacity = Math.Max(renderInstructionBuffer.Capacity, renderInstructionBuffer.Count + x.buffer.Count + 1);
+                foreach (var e in x.buffer)
+                {
+                    renderInstructionBuffer.Add(e);
+                }
+            }
+            pool.Return(x.buffer);
+        }
+
+        (List<ScreenRenderInstruction<TEntity>> buffer, IViewPort vp) ProcessQueryPlanParallel(QueryPlan qp, 
+                                                                                               ParallelLoopState ls, 
+                                                                                               (List<ScreenRenderInstruction<TEntity>> buffer, IViewPort vp) x)
+        {
+            PrepareRendering(x.vp, qp, x.buffer);
+            return x;
+        }
+        
         void SortForScreenRenderPosition()
         {
             var comparer = renderSortOrder.AsComparer<TEntity>();
@@ -140,20 +169,28 @@ namespace SharpTileRenderer.Drawing.Layers
         {
             var gridType = v.GridType;
 
-            for (var index = 0; index < tileBuffer.Count; index++)
+            var mappingResult = mappingResultPool.Get();
+            try
             {
-                var t = tileBuffer[index];
-                var mapPos = t.SpritePosition.Apply(t.MapPosition, gridType);
-
-                // if the screen has wrapping enabled and a full wrap around occurs (ie the full map is visible),
-                // any map tile can be rendered multiple times on screen at different positions. 
-                mappingResult.Clear();
-                v.ScreenSpaceNavigator.MapInverse(v, mapPos, mappingResult);
-                for (var i = 0; i < mappingResult.Count; i++)
+                for (var index = 0; index < tileBuffer.Count; index++)
                 {
-                    var mr = mappingResult[i];
-                    resultBuffer.Add(new ScreenRenderInstruction<TEntity>(t, mr, resultBuffer.Count));
+                    var t = tileBuffer[index];
+                    var mapPos = t.SpritePosition.Apply(t.MapPosition, gridType);
+
+                    // if the screen has wrapping enabled and a full wrap around occurs (ie the full map is visible),
+                    // any map tile can be rendered multiple times on screen at different positions. 
+                    mappingResult.Clear();
+                    v.ScreenSpaceNavigator.MapInverse(v, mapPos, mappingResult);
+                    for (var i = 0; i < mappingResult.Count; i++)
+                    {
+                        var mr = mappingResult[i];
+                        resultBuffer.Add(new ScreenRenderInstruction<TEntity>(t, mr, resultBuffer.Count));
+                    }
                 }
+            }
+            finally
+            {
+                mappingResultPool.Return(mappingResult);
             }
         }
 

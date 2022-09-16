@@ -221,13 +221,13 @@ namespace SharpTileRenderer.Drawing.Monogame
 
             switch (dir)
             {
-                case TextureQuadrantIndex.West:
-                    return new TextureCoordinateRect(0, 0, wHalf, hHalf);
                 case TextureQuadrantIndex.North:
-                    return new TextureCoordinateRect(wHalf, 0, w - wHalf, hHalf);
+                    return new TextureCoordinateRect(0, 0, wHalf, hHalf);
                 case TextureQuadrantIndex.East:
-                    return new TextureCoordinateRect(wHalf, hHalf, w - wHalf, h - hHalf);
+                    return new TextureCoordinateRect(wHalf, 0, w - wHalf, hHalf);
                 case TextureQuadrantIndex.South:
+                    return new TextureCoordinateRect(wHalf, hHalf, w - wHalf, h - hHalf);
+                case TextureQuadrantIndex.West:
                     return new TextureCoordinateRect(0, hHalf, wHalf, h - hHalf);
                 default:
                     throw new ArgumentException();

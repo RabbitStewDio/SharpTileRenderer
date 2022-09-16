@@ -15,6 +15,11 @@ namespace SharpTileRenderer
 
     public interface IFeatureModule
     {
+        /// <summary>
+        ///   Modules with higher values are tried first.
+        /// </summary>
+        int PreferenceWeight { get; }
+        
         void Initialize<TClassification>(IFeatureInitializer<TClassification> initializer) 
             where TClassification : struct, IEntityClassification<TClassification>;
     }

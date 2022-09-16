@@ -76,7 +76,7 @@ namespace SharpTileRenderer.Strategy.MonoGame
             var scrollTarget = vp.ScreenSpaceNavigator.TranslateViewToWorld(vp, targetScreenPos).VirtualCoordinate;
             var mapDelta = scrollTarget - currentFocus;
             vp.Focus = dragStartPosition - mapDelta;
-            //Console.WriteLine("Drag : " + mapDelta);
+            Console.WriteLine("Drag : " + vp.Focus);
         }
 
         protected override void Dispose(bool disposing)

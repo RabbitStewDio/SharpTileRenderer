@@ -1,108 +1,205 @@
-﻿using SharpTileRenderer.Drawing;
-using SharpTileRenderer.TexturePack;
+﻿using Serilog;
+using SharpTileRenderer.Drawing;
+using SharpTileRenderer.Drawing.Rendering;
+using SharpTileRenderer.Navigation;
 using SharpTileRenderer.TexturePack.Operations;
 using SharpTileRenderer.TexturePack.Tiles;
 using SharpTileRenderer.TileBlending.Matcher;
 using SharpTileRenderer.TileBlending.Textures;
 using SharpTileRenderer.TileMatching;
-using SharpTileRenderer.TileMatching.DataSets;
 using SharpTileRenderer.TileMatching.Model;
-using System;
-using System.Diagnostics.CodeAnalysis;
-
-// the CSharp compiler is messing up the MaybeNullWhen(false) annotation on "layerProducer.TryGetFeature". So screw the bogus compiler warning
-#pragma warning disable CS8600
+using SharpTileRenderer.TileMatching.Model.Selectors;
+using SharpTileRenderer.Util;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SharpTileRenderer.TileBlending
 {
-    public class TextureBlendingTileModule : IDrawingFeatureModule
+    public static class TextureBlendingTileModule
     {
-        public void Initialize<TClassification>(IFeatureInitializer<TClassification> initializer) where TClassification : struct, IEntityClassification<TClassification>
+        public const string FeatureFlag = "blend-layer";
+
+        public static TextureBlendingTileModule<TTexture, TColor> For<TTexture, TColor>(ITextureOperations<TTexture, TColor> op)
+            where TTexture : ITexture<TTexture>
+        {
+            return new TextureBlendingTileModule<TTexture, TColor>(op);
+        }
+    }
+
+    public class TextureBlendingTileModule<TTexture, TColor> : IDrawingFeatureModule
+        where TTexture : ITexture<TTexture>
+    {
+        readonly ILogger logger = SLog.ForContext<TextureBlendingTileModule<TTexture, TColor>>();
+
+        readonly ITextureOperations<TTexture, TColor> textureOperations;
+        bool reentryCheck;
+
+        public TextureBlendingTileModule(ITextureOperations<TTexture, TColor> textureOperations)
+        {
+            this.textureOperations = textureOperations;
+        }
+
+        public void Initialize<TClassification>(IRenderLayerProducerConfig<TClassification> initializer) where TClassification : struct, IEntityClassification<TClassification>
         {
             initializer.MatcherFactory.RegisterTagSelector(BlendingSelectorModel.SelectorName, BlendingSpriteMatcher<TClassification>.Create);
         }
 
-        public bool CreateRendererForData<TEntity, TClassification>(RenderLayerProducerData<TClassification> layerProducer,
-                                                                    ITileDataSetProducer<TEntity> dataSet,
-                                                                    [MaybeNullWhen(false)] out IRenderLayerProducer<TClassification> c)
-            where TClassification : struct, IEntityClassification<TClassification>
+        public TextureBlendingTileModule<TTexture, TColor> WithTileSet(ITileResolver<SpriteTag, TexturedTile<TTexture>> tileSet)
         {
-            
-            if (!layerProducer.TryGetFeature(out ITextureTileModule f))
-            {
-                c = default;
-                return false;
-            }
-
-            var to = new First<TEntity, TClassification>(layerProducer, dataSet);
-            c = f.WithTextureOperation(to);
-            return c != null;
+            this.TileSet = Optional.OfNullable(tileSet);
+            return this;
         }
 
-        class First<TEntity, TClassification> : ITileSetOperationFunc<IRenderLayerProducer<TClassification>?>
+        public Optional<ITileResolver<SpriteTag, TexturedTile<TTexture>>> TileSet { get; private set; }
+
+        public int PreferenceWeight => 1000;
+
+        public void Initialize<TClassification>(IFeatureInitializer<TClassification> initializer)
             where TClassification : struct, IEntityClassification<TClassification>
         {
-            readonly RenderLayerProducerData<TClassification> layerProducer;
-            readonly ITileDataSetProducer<TEntity> tileDataSetProducer;
+            initializer.MatcherFactory.RegisterTagSelector(BlendingSelectorModel.SelectorName, BlendingSpriteMatcher<TClassification>.Create);
+        }
 
-            public First(RenderLayerProducerData<TClassification> layerProducer,
-                         ITileDataSetProducer<TEntity> tileDataSetProducer)
+        public Optional<ITileRenderer<TEntity>> CreateRendererForData<TEntity, TClassification>(IRenderLayerProducerConfig<TClassification> layerProducer,
+                                                                                                TileMatcherModel model,
+                                                                                                RenderLayerModel layer)
+            where TClassification : struct, IEntityClassification<TClassification>
+        {
+            if (!layer.FeatureFlags.Contains(TextureBlendingTileModule.FeatureFlag))
             {
-                this.layerProducer = layerProducer;
-                this.tileDataSetProducer = tileDataSetProducer;
+                return Optional.Empty();
             }
 
-            public IRenderLayerProducer<TClassification>? Apply<TTexture>(ITexturedTileModule<TTexture> mod)
-                where TTexture : ITexture<TTexture>
+            if (!TileSet.TryGetValue(out var tileSet))
             {
-                if (!mod.TileSet.TryGetValue(out var ts))
+                logger.Warning("Skipping blend-layer renderer; No tile set provided");
+                return Optional.Empty();
+            }
+
+            if (reentryCheck)
+            {
+                logger.Warning("Skipping request to build renderer. Recursive calls are not supported by the blend-module");
+                return Optional.Empty();
+            }
+
+            reentryCheck = true;
+            try
+            {
+                if (!FindBlendSelector(layer).TryGetValue(out var blendSelector))
                 {
-                    return null;
+                    logger.Warning("Skipping request to build renderer. Unable to find blend-selector in layer {Layer}", layer.Id);
+                    return Optional.Empty();
                 }
 
-                ITileResolver<SpriteTag, TexturedTile<TTexture>> Produce(RenderLayerModel m)
+                if (!layerProducer.TryGetFeature<ITexturedTileRendererFeatureModule<TTexture>>(out var drawFeature, f => f.PreferenceWeight < PreferenceWeight))
                 {
-                    return mod.WithTextureOperation(new Second<TTexture>(m, ts)) ?? throw new Exception();
-                }
-                
-                if (!layerProducer.TryGetFeature(out ITexturedTileRendererFeatureModule<TTexture> t))
-                {
-                    return null;
-                }
-                
-                if (t.CreateRendererForData<TEntity, TClassification>(tileDataSetProducer, Produce, "blend-layer", out var p))
-                {
-                    return p;
+                    logger.Warning("Skipping request to build renderer. Unable to find parent renderer");
+                    return Optional.Empty();
                 }
 
-                return null;
+                var blendTileSpriteTag = FindBlendTile(layer);
+                var graphicTags = FindMatchingGraphics(model, blendSelector.MatchWith);
+                var blendGenerator = new BlendTileGenerator<TTexture, TColor>(textureOperations, tileSet.TileSize);
+
+                if (!tileSet.TryFind(blendTileSpriteTag, out var blendTile))
+                {
+                    logger.Warning("Skipping request to build renderer. Unable to find blend tile {BlendTile}", blendTileSpriteTag);
+                    return Optional.Empty();
+                }
+
+                var tileRegistry = new SpriteTagTileResolver<TexturedTile<TTexture>>(tileSet.TileSize);
+                var directions = new[] { TextureQuadrantIndex.North, TextureQuadrantIndex.East, TextureQuadrantIndex.South, TextureQuadrantIndex.West };
+                foreach (var tag in graphicTags)
+                {
+                    var spriteTag = tag.AsSpriteTag().WithPrefix(blendSelector.SourcePrefix).WithQualifier(blendSelector.SourceSuffix);
+                    if (!tileSet.TryFind(spriteTag, out var tile))
+                    {
+                        logger.Warning("Blend-Tile generator: Unable to find source tile {SourceTile}", spriteTag);
+                        continue;
+                    }
+
+                    foreach (var dir in directions)
+                        if (blendGenerator.TryCreateBlendTile(tile, blendTile, dir, out var generatedTile))
+                        {
+                            var generatedSpriteTag = tag.AsSpriteTag()
+                                                        .WithPrefix(blendSelector.Prefix)
+                                                        .WithQualifier(BlendingSpriteMatcher<TClassification>.BlendSuffixFor(dir));
+                            tileRegistry.Add(generatedSpriteTag, generatedTile);
+                        }
+                }
+
+                return drawFeature.CreateRendererForData<TEntity, TClassification>(layerProducer, model, layer, tileRegistry);
+            }
+            finally
+            {
+                reentryCheck = false;
             }
         }
 
-        class Second<TTexture> : ITextureOperationFunc<ITileResolver<SpriteTag, TexturedTile<TTexture>>, TTexture>
-            where TTexture : ITexture<TTexture>
+        List<GraphicTag> FindMatchingGraphics(TileMatcherModel model, IReadOnlyList<string> classes)
         {
-            readonly RenderLayerModel renderLayerModel;
-            readonly ITileResolver<SpriteTag, TexturedTile<TTexture>> modTileSet;
-
-            public Second(RenderLayerModel renderLayerModel, ITileResolver<SpriteTag, TexturedTile<TTexture>> modTileSet)
+            var tags = new List<GraphicTag>();
+            foreach (var tag in model.Tags)
             {
-                this.renderLayerModel = renderLayerModel;
-                this.modTileSet = modTileSet;
-            }
-
-            public ITileResolver<SpriteTag, TexturedTile<TTexture>> Apply<TColor>(ITextureOperations<TTexture, TColor> op)
-            {
-                var blendOp = new BlendTileGenerator<TTexture, TColor>(op, modTileSet.TileSize);
-                var blendTile = renderLayerModel.Properties["blend-tile"];
-
-                var blendTileTag = SpriteTag.Parse(blendTile);
-                if (!blendTileTag.TryGetValue(out var tag))
+                var graphicTag = GraphicTag.From(tag.Id);
+                if (graphicTag == GraphicTag.Empty)
                 {
-                    tag = SpriteTag.Create("t", "dither-mask", null);
+                    continue;
                 }
-                return new BlendedTileResolver<TTexture>(modTileSet, tag, blendOp);
+
+                if (tag.Classes.Union(classes).Any())
+                {
+                    tags.Add(graphicTag);
+                }
             }
+
+            return tags;
+        }
+
+        Optional<BlendingSelectorModel> FindBlendSelector(RenderLayerModel layer)
+        {
+            if (layer.Match != null && FindBlendSelector(layer.Match).TryGetValue(out var m))
+            {
+                return m;
+            }
+
+            foreach (var l in layer.SubLayers)
+            {
+                if (FindBlendSelector(l).TryGetValue(out var mm))
+                {
+                    return mm;
+                }
+            }
+
+            return Optional.Empty();
+        }
+
+        Optional<BlendingSelectorModel> FindBlendSelector(ISelectorModel selector)
+        {
+            if (selector is BlendingSelectorModel b)
+            {
+                return b;
+            }
+
+            foreach (var s in selector.ChildSelectors)
+            {
+                if (FindBlendSelector(s).TryGetValue(out var m))
+                {
+                    return m;
+                }
+            }
+
+            return Optional.Empty();
+        }
+
+        SpriteTag FindBlendTile(RenderLayerModel renderLayerModel)
+        {
+            if (renderLayerModel.Properties.TryGetValue("blend-tile", out var blendTileName) && SpriteTag.Parse(blendTileName).TryGetValue(out var tag))
+            {
+                return tag;
+            }
+
+            return SpriteTag.Create("blend-layer", "dither-mask", null);
         }
     }
 }

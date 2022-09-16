@@ -31,6 +31,8 @@
                 <xsd:extension base="tm:matcherElement">
                     <xsd:sequence>
                         <xsd:element name="prefix" type="xsd:string" minOccurs="0"/>
+                        <xsd:element name="source-prefix" type="xsd:string" minOccurs="0"/>
+                        <xsd:element name="source-suffix" type="xsd:string" minOccurs="0"/>
                         <xsd:element name="context-data-set" type="xsd:string"/>
                         <xsd:element name="match-self" type="matchesElement"/>
                         <xsd:element name="match-with" type="matchesElement"/>
@@ -182,7 +184,7 @@
     <xsd:complexType name="choiceSelectionElement">
         <xsd:sequence>
             <xsd:element ref="tm:matcherAbstract" maxOccurs="1"/>
-            <xsd:element name="choice-matches" type="ts:choiceMatchesElement"/>
+            <xsd:element name="choice-matches" type="ts:choiceMatchesElement" minOccurs="0"/>
         </xsd:sequence>
     </xsd:complexType>
 

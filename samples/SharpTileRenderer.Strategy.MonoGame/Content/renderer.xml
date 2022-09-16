@@ -87,6 +87,7 @@
             </entity-source>
             <ts:blend>
                 <ts:prefix>blend.</ts:prefix>
+                <ts:source-prefix>t.l0.</ts:source-prefix>
                 <ts:context-data-set>terrain</ts:context-data-set>
                 <ts:match-self>
                     <ts:class>blend</ts:class>

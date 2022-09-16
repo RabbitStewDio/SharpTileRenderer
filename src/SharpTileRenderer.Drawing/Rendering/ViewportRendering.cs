@@ -1,7 +1,10 @@
-﻿using SharpTileRenderer.Drawing.Layers;
+﻿using Microsoft.Extensions.ObjectPool;
+using Serilog;
+using SharpTileRenderer.Drawing.Layers;
 using SharpTileRenderer.Drawing.Queries;
 using SharpTileRenderer.Drawing.ViewPorts;
-using System;
+using SharpTileRenderer.Navigation;
+using SharpTileRenderer.Util;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -11,11 +14,13 @@ namespace SharpTileRenderer.Drawing.Rendering
 {
     public class ViewportRendering
     {
+        readonly ILogger logger = SLog.ForContext<ViewportRendering>();
         readonly SemaphoreSlim syncRoot;
         readonly IViewPort vp;
         readonly List<QueryPlan> queryPlanBuffer;
         readonly List<ConfiguredTaskAwaitable> taskBuffer;
         readonly List<ConfiguredValueTaskAwaitable> valueTaskBuffer;
+        readonly ObjectPool<List<ILayer>> layerLists;
         bool first;
 
         public ViewportRendering(IViewPort vp)
@@ -25,6 +30,7 @@ namespace SharpTileRenderer.Drawing.Rendering
             this.taskBuffer = new List<ConfiguredTaskAwaitable>();
             this.valueTaskBuffer = new List<ConfiguredValueTaskAwaitable>();
             this.queryPlanBuffer = new List<QueryPlan>();
+            this.layerLists = new DefaultObjectPool<List<ILayer>>(new ListObjectPolicy<ILayer>());
         }
 
         public void Render(params ILayer[] layer)
@@ -37,21 +43,51 @@ namespace SharpTileRenderer.Drawing.Rendering
             {
                 foreach (var p in queryPlanBuffer)
                 {
-                    Console.WriteLine("QueryPlan: " + p);
+                    logger.Information("QueryPlan: {Plan}", p);
                 }
 
                 first = true;
             }
 
-            foreach (var l in layer)
+            var threadSafeLayers = layerLists.Get();
+            try
             {
-                l.PrepareRenderLayer(vp, queryPlanBuffer);
+
+                foreach (var l in layer)
+                {
+                    if (l.ThreadSafePreparation)
+                    {
+                        threadSafeLayers.Add(l);
+                    }
+                    else
+                    {
+                        l.PrepareRenderLayer(vp, queryPlanBuffer);
+                    }
+                }
+
+                if (threadSafeLayers.Count > 0)
+                {
+                    var result = Parallel.ForEach(threadSafeLayers, ProcessRenderLayerParallel);
+                    if (!result.IsCompleted)
+                    {
+                        // log error
+                    }
+                }
+            }
+            finally
+            {
+                layerLists.Return(threadSafeLayers);
             }
 
             foreach (var l in layer)
             {
                 l.RenderLayer(vp);
             }
+        }
+
+        void ProcessRenderLayerParallel(ILayer l)
+        {
+            l.PrepareRenderLayer(vp, queryPlanBuffer);
         }
 
         public Task RenderAsync(params ILayer[] layer) => RenderAsync(layer, CancellationToken.None);

@@ -61,6 +61,11 @@ namespace SharpTileRenderer.TileMatching
         }
 
         public static SpriteTag Create(string? prefix, string? id, string? suffix) => new SpriteTag(Normalize(prefix), Normalize(id), Normalize(suffix));
+
+        public SpriteTag With(GraphicTag t)
+        {
+            return new SpriteTag(prefix, t.Id, qualifier);
+        }
         
         public static SpriteTag FromGraphicTag(GraphicTag t)
         {
