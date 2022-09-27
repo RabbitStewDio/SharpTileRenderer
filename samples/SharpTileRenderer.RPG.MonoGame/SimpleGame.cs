@@ -6,7 +6,6 @@ using SharpTileRenderer.RPG.Base;
 using SharpTileRenderer.RPG.Base.Map;
 using SharpTileRenderer.RPG.Base.Model;
 using SharpTileRenderer.RPG.Base.Util;
-using SharpTileRenderer.Strategy.MonoGame;
 using SharpTileRenderer.TexturePack;
 using SharpTileRenderer.TexturePack.Tiles;
 using SharpTileRenderer.TileBlending.Xml;

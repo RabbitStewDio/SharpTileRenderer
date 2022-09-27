@@ -6,7 +6,6 @@ using SharpTileRenderer.TileMatching;
 using SharpTileRenderer.TileMatching.DataSets;
 using SharpTileRenderer.TileMatching.Model.Selectors;
 using SharpTileRenderer.TileMatching.Selectors;
-using SharpTileRenderer.TileMatching.Selectors.BuiltIn;
 using System;
 using System.Collections.Generic;
 

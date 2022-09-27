@@ -1,5 +1,4 @@
-﻿using SharpTileRenderer.TexturePack;
-using System;
+﻿using System;
 
 namespace SharpTileRenderer.Drawing.ViewPorts
 {

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using SharpTileRenderer.Drawing;
 using SharpTileRenderer.Drawing.Monogame;
 using SharpTileRenderer.Drawing.ViewPorts;
