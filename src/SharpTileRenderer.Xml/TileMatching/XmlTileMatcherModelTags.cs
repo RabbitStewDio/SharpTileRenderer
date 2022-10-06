@@ -5,12 +5,12 @@ namespace SharpTileRenderer.Xml.TileMatching
     public static class XmlTileSelectorModelTags
     {
         public static readonly XNamespace Ns = "https://docs.rabbit-stew-dio.com/xml-schema/tileselector/v1/";
-        public static readonly XName PrefixTag = XmlTileSelectorModelTags.Ns + "prefix";
-        public static readonly XName SuffixTag = XmlTileSelectorModelTags.Ns + "suffix";
-        public static readonly XName ContextDataSetTag = XmlTileSelectorModelTags.Ns + "context-data-set";
-        public static readonly XName MatchClassTag = XmlTileSelectorModelTags.Ns + "class";
-        public static readonly XName DefaultClassTag = XmlTileSelectorModelTags.Ns + "default-class";
-        public static readonly XName ForceGraphicTag = XmlTileSelectorModelTags.Ns + "force-graphic";
+        public static readonly XName PrefixTag = Ns + "prefix";
+        public static readonly XName SuffixTag = Ns + "suffix";
+        public static readonly XName ContextDataSetTag = Ns + "context-data-set";
+        public static readonly XName MatchClassTag = Ns + "class";
+        public static readonly XName DefaultClassTag = Ns + "default-class";
+        public static readonly XName ForceGraphicTag = Ns + "force-graphic";
     }
     
     public static class XmlTileMatcherModelTags

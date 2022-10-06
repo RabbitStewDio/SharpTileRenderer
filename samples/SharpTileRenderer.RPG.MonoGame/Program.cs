@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Serilog;
-using SharpTileRenderer.RPG.MonoGame;
 using System;
 
-namespace SharpTileRenderer.Strategy.MonoGame
+namespace SharpTileRenderer.RPG.MonoGame
 {
     public static class Program
     {

@@ -1,5 +1,4 @@
 ﻿using SharpTileRenderer.Strategy.Base.Map;
-using SharpTileRenderer.Strategy.Base.Util;
 using System;
 
 namespace SharpTileRenderer.Strategy.Base.Model

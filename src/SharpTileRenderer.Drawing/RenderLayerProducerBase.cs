@@ -36,7 +36,7 @@ namespace SharpTileRenderer.Drawing
                 }
             }
 
-            var queryId = layer?.EntitySource?.EntityQueryId;
+            var queryId = layer.EntitySource?.EntityQueryId;
             if (queryId != null)
             {
                 checkedLayer = true;
@@ -86,7 +86,7 @@ namespace SharpTileRenderer.Drawing
         {
             if (layer.SubLayers.Count > 0)
             {
-                var layers = new List<Layers.ILayer<TEntity>>();
+                var layers = new List<ILayer<TEntity>>();
                 foreach (var subLayer in layer.SubLayers)
                 {
                     layers.Add(CreateInternal(tileMatcherModel, subLayer, parameters));
@@ -117,7 +117,7 @@ namespace SharpTileRenderer.Drawing
         {
             if (layer.SubLayers.Count > 0)
             {
-                var layers = new List<Layers.ILayer<(TEntity, int)>>();
+                var layers = new List<ILayer<(TEntity, int)>>();
                 foreach (var subLayer in layer.SubLayers)
                 {
                     layers.Add(CreateInternalQuantified(tileMatcherModel, subLayer, parameters));

@@ -1,7 +1,6 @@
-﻿using SharpTileRenderer.Strategy.Base.Map;
-using System;
+﻿using System;
 
-namespace SharpTileRenderer.Strategy.Base.Util
+namespace SharpTileRenderer.Strategy.Base.Map
 {
     public interface IMap2D<out TEntity>
     {

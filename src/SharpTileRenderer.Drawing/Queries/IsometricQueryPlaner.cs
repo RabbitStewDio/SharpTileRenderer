@@ -89,14 +89,6 @@ namespace SharpTileRenderer.Drawing.Queries
             }
         }
 
-        IMapNavigator<GridDirection> Fetch(NavigatorMetaData md)
-        {
-            var normalizedMetaData = md.WithoutHorizontalOperation()
-                                       .WithoutVerticalOperation();
-            var navigator = normalizedMetaData.BuildNavigator();
-            return navigator;
-        }
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static int Clamp(int value)
         {

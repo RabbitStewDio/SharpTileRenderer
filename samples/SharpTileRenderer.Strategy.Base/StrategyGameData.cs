@@ -1,6 +1,5 @@
 ﻿using SharpTileRenderer.Strategy.Base.Map;
 using SharpTileRenderer.Strategy.Base.Model;
-using SharpTileRenderer.Strategy.Base.Util;
 using System;
 using System.Collections;
 using System.Collections.Generic;

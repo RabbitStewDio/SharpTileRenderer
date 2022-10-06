@@ -56,7 +56,7 @@ namespace SharpTileRenderer.Drawing
             return false;
         }
 
-        public Optional<ILayer> Apply(TileMatcherModel model, RenderLayerModel layer, IRenderLayerTypeLift l) => l.Apply<TEntity>(model, layer, this);
+        public Optional<ILayer> Apply(TileMatcherModel model, RenderLayerModel layer, IRenderLayerTypeLift l) => l.Apply(model, layer, this);
 
         public ITileDataSet<GraphicTag, TEntity> CreateGraphicDataSet(string id)
         {

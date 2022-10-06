@@ -4,10 +4,12 @@ using SharpTileRenderer.Drawing.ViewPorts;
 using SharpTileRenderer.Drawing.ViewPorts.ScreenMapConverters;
 using SharpTileRenderer.Navigation;
 using SharpTileRenderer.TexturePack;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SharpTileRenderer.Tests.Drawing
 {
     [TestFixture]
+    [SuppressMessage("ReSharper", "NotNullOrRequiredMemberIsNotInitialized")]
     public class IsoDiamondScreenToMapConverterTest
     {
         ViewPort viewPort;

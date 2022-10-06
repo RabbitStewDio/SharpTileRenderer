@@ -1,6 +1,4 @@
-﻿using SharpTileRenderer.Strategy.Base.Util;
-
-namespace SharpTileRenderer.Strategy.Base.Map
+﻿namespace SharpTileRenderer.Strategy.Base.Map
 {
     public interface IFogMap: IMap2D<FogState>
     {

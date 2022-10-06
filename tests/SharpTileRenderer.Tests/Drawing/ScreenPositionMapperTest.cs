@@ -16,7 +16,6 @@ namespace SharpTileRenderer.Tests.Drawing
         {
             var viewPort = new ViewPort(NavigatorMetaData.FromGridType(GridType.Grid), TileShape.Grid, new IntDimension(32, 32));
             viewPort.PixelBounds = new ScreenBounds(0, 0, 320, 240);
-            var snav = viewPort.ScreenSpaceNavigator;
 
             var sm = new ScreenPositionMapper(GridType.Grid, new IntDimension(32, 32));
             sm.AddPhysical(new MapCoordinate(1,1), new ScreenPosition(1, 2));

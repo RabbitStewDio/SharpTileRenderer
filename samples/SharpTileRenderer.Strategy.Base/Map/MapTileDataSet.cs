@@ -1,5 +1,4 @@
 ﻿using SharpTileRenderer.Navigation;
-using SharpTileRenderer.Strategy.Base.Util;
 using SharpTileRenderer.TileMatching;
 using SharpTileRenderer.TileMatching.DataSets;
 using SharpTileRenderer.TileMatching.Model.DataSets;

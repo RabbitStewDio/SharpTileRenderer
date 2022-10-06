@@ -11,7 +11,6 @@ namespace SharpTileRenderer.RPG.Base
 {
     public class DungeonGameData
     {
-        readonly DungeonGameRules rules;
         public int TerrainWidth { get; }
         public int TerrainHeight { get; }
         public DefaultMap<TerrainElement> Terrain { get; }
@@ -20,7 +19,6 @@ namespace SharpTileRenderer.RPG.Base
 
         public DungeonGameData(DungeonGameRules rules)
         {
-            this.rules = rules ?? throw new ArgumentNullException(nameof(rules));
             this.TerrainHeight = 100;
             this.TerrainWidth = 100;
 
