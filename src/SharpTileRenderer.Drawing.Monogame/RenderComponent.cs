@@ -67,7 +67,7 @@ namespace SharpTileRenderer.Drawing.Monogame
             }
         }
 
-        void OnLayersChanged(object sender, NotifyCollectionChangedEventArgs e)
+        void OnLayersChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             this.layersCached = default;
         }
